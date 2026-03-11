@@ -1,0 +1,2573 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="PumpTrack">
+<meta name="theme-color" content="#0d0f14">
+<meta name="format-detection" content="telephone=no">
+<title>PumpTrack · Service Jobs</title>
+<link href="PumpTrack%20%C2%B7%20Service%20Jobs_files/css2.css" rel="stylesheet">
+<style>
+:root {
+  --bg: #0d0f14;
+  --surface: #161920;
+  --surface2: #1e2230;
+  --surface3: #252b3a;
+  --border: #252b3a;
+  --border2: #2e3547;
+  --accent: #f59e0b;
+  --accent-dim: rgba(245,158,11,0.15);
+  --text: #f0f2f7;
+  --text-muted: #7a869e;
+  --text-dim: #3a4258;
+  --green: #10b981;
+  --blue: #3b82f6;
+  --red: #ef4444;
+  --orange: #f97316;
+  --yellow: #eab308;
+  --purple: #8b5cf6;
+  --p1: #ef4444;
+  --p2: #f97316;
+  --p3: #eab308;
+  --p4: #10b981;
+  --p5: #7a869e;
+  --nav-h: 60px;
+  --header-h: 56px;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+/* Prevent iOS text size adjustment */
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+html, body {
+  height: 100%;
+  /* Use dvh for dynamic viewport on iOS Safari */
+  height: 100dvh;
+  width: 100%;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Barlow', sans-serif;
+  font-size: 15px;
+  /* Prevent overscroll/bounce on iOS */
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: touch;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+}
+
+/* iOS Safari input zoom fix — keep font-size >= 16px on inputs */
+input, select, textarea {
+  font-size: 16px !important;
+}
+/* But visually style them smaller */
+input, select { font-size: 16px; }
+
+/* Remove iOS default button styles */
+button { -webkit-appearance: none; appearance: none; }
+
+/* iOS safe area color fill behind status bar */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: var(--safe-top);
+  background: var(--surface);
+  z-index: 999;
+}
+
+/* ===== SHELL ===== */
+#app {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  height: 100dvh;
+  /* iPad: constrain to phone-width column but allow full use */
+  max-width: 600px;
+  width: 100%;
+  margin: 0 auto;
+  position: relative;
+  background: var(--bg);
+  /* iPad desktop chrome shadow */
+  box-shadow: 0 0 80px rgba(0,0,0,0.8);
+  /* Respect left/right safe areas on iPad landscape */
+  padding-left: var(--safe-left);
+  padding-right: var(--safe-right);
+  overflow: hidden;
+}
+
+/* iPad: show sidebar-style on larger screens */
+@media (min-width: 768px) {
+  body {
+    background: #080a0e;
+    display: flex;
+    align-items: stretch;
+    justify-content: center;
+  }
+  #app {
+    max-width: 680px;
+    border-left: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+  }
+}
+
+/* ===== SCREEN ===== */
+.screen {
+  display: none;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+}
+.screen.active { display: flex; }
+
+/* ===== TOP BAR ===== */
+.topbar {
+  height: calc(var(--header-h) + var(--safe-top));
+  padding-top: var(--safe-top);
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding-left: 16px;
+  padding-right: 16px;
+  gap: 12px;
+  flex-shrink: 0;
+  position: relative;
+  /* Blur effect like native iOS nav bars */
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+}
+
+.topbar-logo {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.topbar-logo span { color: var(--text-muted); font-weight: 400; }
+
+.topbar-title {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  flex: 1;
+}
+
+.back-btn {
+  background: none;
+  border: none;
+  color: var(--accent);
+  font-size: 22px;
+  padding: 8px;
+  margin: -8px;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.topbar-action {
+  background: var(--accent);
+  border: none;
+  color: #000;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 7px 14px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-left: auto;
+}
+
+/* ===== SCROLL AREA ===== */
+.scroll-area {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  /* Account for bottom nav + home indicator */
+  padding-bottom: calc(var(--nav-h) + var(--safe-bottom) + 16px);
+  /* Prevent scroll chaining on iOS */
+  overscroll-behavior-y: contain;
+}
+
+/* ===== BOTTOM NAV ===== */
+.bottom-nav {
+  /* Fixed height + dynamic safe area for home indicator */
+  height: calc(var(--nav-h) + var(--safe-bottom));
+  padding-bottom: var(--safe-bottom);
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: flex-start;
+  padding-top: 6px;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 50;
+  /* iOS blur nav bar effect */
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+}
+
+.nav-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  /* iOS minimum touch target: 44x44pt */
+  min-height: 44px;
+  padding: 6px 4px;
+  cursor: pointer;
+  border: none;
+  background: none;
+  color: var(--text-dim);
+  transition: color 0.15s;
+  /* Prevent text selection on tap */
+  -webkit-user-select: none;
+  user-select: none;
+}
+.nav-item.active { color: var(--accent); }
+.nav-item:active { transform: scale(0.9); opacity: 0.8; }
+
+.nav-icon { font-size: 20px; line-height: 1; }
+.nav-label {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.nav-badge {
+  position: absolute;
+  top: 6px;
+  right: calc(50% - 18px);
+  background: var(--red);
+  color: #fff;
+  font-size: 9px;
+  font-weight: 700;
+  min-width: 16px;
+  height: 16px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+}
+
+/* ===== HOME SCREEN ===== */
+.home-hero {
+  background: linear-gradient(135deg, var(--surface) 0%, #1a1f2e 100%);
+  padding: 20px 16px 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.home-greeting {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 2px;
+}
+
+.home-date {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  color: var(--text);
+  margin-bottom: 16px;
+}
+
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.stat-card {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 8px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.stat-card::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 2px;
+}
+.stat-card.sc-total::after { background: var(--accent); }
+.stat-card.sc-active::after { background: var(--blue); }
+.stat-card.sc-parts::after { background: var(--orange); }
+.stat-card.sc-urgent::after { background: var(--red); }
+
+.stat-num {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 28px;
+  font-weight: 800;
+  line-height: 1;
+  margin-bottom: 2px;
+}
+.stat-card.sc-total .stat-num { color: var(--accent); }
+.stat-card.sc-active .stat-num { color: var(--blue); }
+.stat-card.sc-parts .stat-num { color: var(--orange); }
+.stat-card.sc-urgent .stat-num { color: var(--red); }
+
+.stat-lbl {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  line-height: 1.2;
+}
+
+/* Priority queue section */
+.section-head {
+  padding: 16px 16px 8px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.section-head-link {
+  color: var(--accent);
+  font-size: 11px;
+  cursor: pointer;
+  background: none;
+  border: none;
+}
+
+.priority-queue { padding: 0 16px; display: flex; flex-direction: column; gap: 8px; }
+
+/* ===== JOB CARD ===== */
+.job-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.12s, box-shadow 0.12s;
+  animation: slideUp 0.25s ease both;
+}
+.job-card:active { transform: scale(0.98); }
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.job-card-inner {
+  padding: 12px 14px;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.job-card-priority {
+  width: 4px;
+  border-radius: 2px;
+  align-self: stretch;
+  flex-shrink: 0;
+}
+
+.job-card-body { flex: 1; min-width: 0; }
+
+.job-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 3px;
+}
+
+.job-num-tag {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  color: var(--accent);
+  background: var(--accent-dim);
+  padding: 2px 8px;
+  border-radius: 3px;
+}
+
+.job-customer {
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 2px;
+}
+
+.job-pump {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+  line-height: 1.3;
+}
+
+.job-card-footer {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.status-pill {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 3px 9px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+.sp-completed { background: rgba(16,185,129,0.12); color: var(--green); border: 1px solid rgba(16,185,129,0.3); }
+.sp-progress  { background: rgba(59,130,246,0.12); color: var(--blue); border: 1px solid rgba(59,130,246,0.3); }
+.sp-pending   { background: rgba(234,179,8,0.12); color: var(--yellow); border: 1px solid rgba(234,179,8,0.3); }
+.sp-quote     { background: rgba(122,134,158,0.12); color: var(--text-muted); border: 1px solid rgba(122,134,158,0.3); }
+.sp-parts     { background: rgba(249,115,22,0.12); color: var(--orange); border: 1px solid rgba(249,115,22,0.3); }
+
+.priority-pill {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  padding: 3px 8px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+.pp-1 { background: rgba(239,68,68,0.12); color: var(--p1); }
+.pp-2 { background: rgba(249,115,22,0.12); color: var(--p2); }
+.pp-3 { background: rgba(234,179,8,0.12); color: var(--p3); }
+.pp-4 { background: rgba(16,185,129,0.12); color: var(--p4); }
+.pp-5 { background: rgba(122,134,158,0.12); color: var(--p5); }
+
+.photo-count {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+/* ===== JOBS LIST SCREEN ===== */
+.search-bar {
+  padding: 12px 16px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.search-input-wrap {
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  gap: 8px;
+}
+.search-input-wrap:focus-within { border-color: var(--accent); }
+.search-icon { color: var(--text-dim); font-size: 16px; }
+.search-input-wrap input {
+  flex: 1;
+  background: none;
+  border: none;
+  outline: none;
+  color: var(--text);
+  font-family: 'Barlow', sans-serif;
+  font-size: 16px;
+  padding: 11px 0;
+}
+.search-input-wrap input::placeholder { color: var(--text-dim); }
+
+.filter-chips {
+  padding: 8px 16px;
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  flex-shrink: 0;
+  scrollbar-width: none;
+}
+.filter-chips::-webkit-scrollbar { display: none; }
+
+.chip {
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  color: var(--text-muted);
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 5px 12px;
+  border-radius: 20px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.12s;
+  flex-shrink: 0;
+}
+.chip.active { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
+
+.jobs-list { padding: 8px 16px; display: flex; flex-direction: column; gap: 8px; }
+
+/* iPad: 2 column job cards */
+@media (min-width: 600px) {
+  .jobs-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    padding: 12px 20px;
+    gap: 10px;
+  }
+  .priority-queue {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    padding: 0 20px;
+    gap: 10px;
+  }
+  .stats-row { grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  .home-hero { padding: 24px 20px 20px; }
+  .info-grid { padding: 20px; gap: 14px; }
+}
+
+/* ===== JOB DETAIL SCREEN ===== */
+.detail-hero {
+  background: var(--surface);
+  padding: 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.detail-job-num {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--accent);
+  margin-bottom: 4px;
+}
+
+.detail-customer {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  color: var(--text);
+  margin-bottom: 2px;
+  line-height: 1.1;
+}
+
+.detail-pump {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+
+.detail-badges { display: flex; gap: 6px; flex-wrap: wrap; }
+
+/* detail tabs */
+.detail-tabs {
+  display: flex;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.detail-tab {
+  flex: 1;
+  padding: 12px 8px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  text-align: center;
+  cursor: pointer;
+  color: var(--text-muted);
+  border: none;
+  background: none;
+  border-bottom: 2px solid transparent;
+  transition: all 0.15s;
+}
+.detail-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+.detail-tab-content { display: none; }
+.detail-tab-content.active { display: block; }
+
+/* info grid */
+.info-grid {
+  padding: 16px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.info-field {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+.info-field.full { grid-column: 1 / -1; }
+
+.field-label {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+.field-value {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text);
+  line-height: 1.4;
+}
+
+/* PRIORITY SELECTOR */
+.priority-row {
+  display: flex;
+  gap: 6px;
+  padding: 0 16px 16px;
+}
+.p-btn {
+  flex: 1;
+  padding: 9px 4px;
+  border-radius: 6px;
+  border: 1px solid var(--border2);
+  background: var(--surface2);
+  color: var(--text-muted);
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.12s;
+  line-height: 1.3;
+}
+.p-btn:active { transform: scale(0.95); }
+.p-btn.active-1 { background: rgba(239,68,68,0.2); border-color: var(--p1); color: var(--p1); }
+.p-btn.active-2 { background: rgba(249,115,22,0.2); border-color: var(--p2); color: var(--p2); }
+.p-btn.active-3 { background: rgba(234,179,8,0.2); border-color: var(--p3); color: var(--p3); }
+.p-btn.active-4 { background: rgba(16,185,129,0.2); border-color: var(--p4); color: var(--p4); }
+.p-btn.active-5 { background: rgba(122,134,158,0.2); border-color: var(--p5); color: var(--p5); }
+
+/* ===== PHOTOS TAB ===== */
+.photos-section { padding: 16px; }
+
+.photo-upload-btn {
+  width: 100%;
+  background: var(--surface2);
+  border: 2px dashed var(--border2);
+  border-radius: 10px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: border-color 0.15s;
+  margin-bottom: 16px;
+}
+.photo-upload-btn:active { border-color: var(--accent); }
+.upload-icon { font-size: 28px; }
+.upload-text {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.upload-sub { font-size: 11px; color: var(--text-dim); }
+
+.photo-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+
+.photo-thumb {
+  aspect-ratio: 1;
+  border-radius: 6px;
+  overflow: hidden;
+  position: relative;
+  background: var(--surface2);
+  cursor: pointer;
+}
+.photo-thumb img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.photo-thumb-overlay {
+  position: absolute; inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.photo-thumb:active .photo-thumb-overlay { opacity: 1; }
+.photo-del-btn {
+  background: var(--red);
+  border: none;
+  color: #fff;
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+}
+
+.no-photos {
+  text-align: center;
+  padding: 32px;
+  color: var(--text-dim);
+  font-size: 13px;
+}
+
+/* ===== NOTES TAB ===== */
+.notes-section { padding: 16px; }
+
+.note-composer {
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+.note-composer:focus-within { border-color: var(--accent); }
+
+.note-textarea {
+  width: 100%;
+  background: none;
+  border: none;
+  outline: none;
+  color: var(--text);
+  font-family: 'Barlow', sans-serif;
+  font-size: 14px;
+  padding: 12px 14px;
+  resize: none;
+  min-height: 80px;
+  line-height: 1.5;
+}
+.note-textarea::placeholder { color: var(--text-dim); }
+
+.note-composer-footer {
+  padding: 8px 12px;
+  display: flex;
+  justify-content: flex-end;
+  border-top: 1px solid var(--border);
+}
+
+.post-btn {
+  background: var(--accent);
+  border: none;
+  color: #000;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 7px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.post-btn:active { transform: scale(0.95); }
+
+.notes-log { display: flex; flex-direction: column; gap: 10px; }
+
+.note-entry {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 14px;
+  animation: slideUp 0.2s ease;
+}
+
+.note-meta {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.note-author {
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.note-body {
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.5;
+}
+
+.no-notes {
+  text-align: center;
+  padding: 32px;
+  color: var(--text-dim);
+  font-size: 13px;
+}
+
+/* ===== EDIT FIELDS ===== */
+.edit-field {
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  border-radius: 6px;
+  color: var(--text);
+  font-family: 'Barlow', sans-serif;
+  font-size: 16px;
+  padding: 9px 12px;
+  width: 100%;
+  outline: none;
+  transition: border-color 0.15s;
+  /* iOS: remove default appearance on select */
+  -webkit-appearance: none;
+  appearance: none;
+}
+.edit-field:focus { border-color: var(--accent); }
+.edit-field option { background: var(--surface2); }
+
+/* ===== FAB ===== */
+.fab {
+  position: absolute;
+  bottom: calc(var(--nav-h) + var(--safe-bottom) + 16px);
+  right: 20px;
+  width: 56px; height: 56px;
+  background: var(--accent);
+  border: none;
+  border-radius: 50%;
+  font-size: 26px;
+  color: #000;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 20px rgba(245,158,11,0.45);
+  z-index: 40;
+  transition: transform 0.15s, box-shadow 0.15s;
+  min-width: 44px; min-height: 44px;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.fab:active { transform: scale(0.9); box-shadow: 0 2px 10px rgba(245,158,11,0.3); }
+
+/* ===== ADD JOB SHEET ===== */
+.sheet-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.65);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  z-index: 100;
+  display: none;
+  align-items: flex-end;
+  justify-content: center;
+  /* Prevent scroll behind on iOS */
+  overscroll-behavior: none;
+}
+.sheet-overlay.open { display: flex; }
+
+.sheet {
+  background: var(--surface);
+  border-radius: 20px 20px 0 0;
+  width: 100%;
+  max-width: 680px;
+  max-height: 94vh;
+  max-height: 94dvh;
+  display: flex;
+  flex-direction: column;
+  animation: sheetUp 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+  /* Bottom safe area inside sheet */
+  padding-bottom: var(--safe-bottom);
+  /* Prevent rubber-band scroll from sheet itself */
+  overscroll-behavior: contain;
+}
+
+@keyframes sheetUp {
+  from { transform: translateY(100%); opacity: 0.5; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.sheet-handle {
+  width: 36px; height: 4px;
+  background: var(--border2);
+  border-radius: 2px;
+  margin: 10px auto 0;
+  flex-shrink: 0;
+}
+
+.sheet-header {
+  padding: 12px 20px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.sheet-title {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.sheet-close {
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  color: var(--text-muted);
+  width: 32px; height: 32px;
+  border-radius: 6px;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+}
+
+.sheet-body {
+  padding: 16px 20px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  /* Extra padding so content isn't hidden behind home indicator */
+  padding-bottom: 24px;
+}
+
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+
+.form-label {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.sheet-p-row {
+  display: flex; gap: 6px;
+}
+.sheet-p-btn {
+  flex: 1;
+  padding: 8px 2px;
+  border-radius: 6px;
+  border: 1px solid var(--border2);
+  background: var(--surface2);
+  color: var(--text-muted);
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-align: center;
+  cursor: pointer;
+  line-height: 1.3;
+  transition: all 0.12s;
+}
+.sheet-p-btn.active-1 { background: rgba(239,68,68,0.2); border-color: var(--p1); color: var(--p1); }
+.sheet-p-btn.active-2 { background: rgba(249,115,22,0.2); border-color: var(--p2); color: var(--p2); }
+.sheet-p-btn.active-3 { background: rgba(234,179,8,0.2); border-color: var(--p3); color: var(--p3); }
+.sheet-p-btn.active-4 { background: rgba(16,185,129,0.2); border-color: var(--p4); color: var(--p4); }
+.sheet-p-btn.active-5 { background: rgba(122,134,158,0.2); border-color: var(--p5); color: var(--p5); }
+
+.sheet-save-btn {
+  background: var(--accent);
+  border: none;
+  color: #000;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  width: 100%;
+  margin-top: 4px;
+}
+.sheet-save-btn:active { transform: scale(0.98); }
+
+/* ===== PHOTO LIGHTBOX ===== */
+.lightbox {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.96);
+  z-index: 200;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: calc(var(--safe-top) + 16px) 16px calc(var(--safe-bottom) + 16px);
+}
+.lightbox.open { display: flex; }
+.lightbox img {
+  max-width: 100%;
+  max-height: 100%;
+  border-radius: 8px;
+  object-fit: contain;
+}
+.lightbox-close {
+  position: absolute;
+  top: calc(var(--safe-top) + 16px);
+  right: 16px;
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.25);
+  color: #fff;
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  /* iOS minimum touch target */
+  min-width: 44px; min-height: 44px;
+}
+
+/* ===== EMPTY ===== */
+.empty-list {
+  text-align: center;
+  padding: 48px 24px;
+  color: var(--text-dim);
+}
+.empty-list .empty-icon { font-size: 40px; margin-bottom: 12px; }
+.empty-list p { font-size: 13px; line-height: 1.5; }
+
+/* ===== TIME TRACKING ===== */
+.time-emp-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.time-emp-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 10px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+.time-emp-card:active { transform: scale(0.97); }
+.time-emp-card::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 2px;
+}
+.tec-g::after { background: #6366f1; }
+.tec-j::after { background: #06b6d4; }
+.tec-c::after { background: #ec4899; }
+
+.tec-avatar {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 15px;
+  font-weight: 800;
+  margin: 0 auto 6px;
+}
+.tec-g .tec-avatar { background: rgba(99,102,241,0.2); color: #6366f1; }
+.tec-j .tec-avatar { background: rgba(6,182,212,0.2); color: #06b6d4; }
+.tec-c .tec-avatar { background: rgba(236,72,153,0.2); color: #ec4899; }
+
+.tec-name {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tec-hours {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1;
+  margin-bottom: 2px;
+}
+.tec-g .tec-hours { color: #6366f1; }
+.tec-j .tec-hours { color: #06b6d4; }
+.tec-c .tec-hours { color: #ec4899; }
+
+.tec-lbl {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+/* Weekly bar chart */
+.weekly-chart {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px;
+  margin-bottom: 4px;
+}
+.weekly-chart-title {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+}
+.weekly-bars {
+  display: flex;
+  gap: 6px;
+  align-items: flex-end;
+  height: 60px;
+}
+.weekly-bar-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  height: 100%;
+  justify-content: flex-end;
+}
+.weekly-bar {
+  width: 100%;
+  background: var(--accent);
+  border-radius: 3px 3px 0 0;
+  min-height: 2px;
+  transition: height 0.3s ease;
+  opacity: 0.85;
+}
+.weekly-bar-lbl {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 9px;
+  font-weight: 600;
+  color: var(--text-dim);
+  letter-spacing: 0.5px;
+}
+.weekly-bar-val {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+/* Time entry card */
+.time-entry-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin-bottom: 8px;
+  animation: slideUp 0.2s ease both;
+  position: relative;
+}
+
+.te-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.te-avatar {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 12px;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.te-info { flex: 1; min-width: 0; }
+
+.te-name {
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--text);
+}
+
+.te-meta {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.te-hours-badge {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.te-desc {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.4;
+  margin-top: 4px;
+}
+
+.te-job-tag {
+  display: inline-block;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  background: var(--accent-dim);
+  color: var(--accent);
+  padding: 2px 7px;
+  border-radius: 3px;
+  margin-top: 6px;
+}
+
+.te-delete {
+  position: absolute;
+  top: 10px; right: 10px;
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  font-size: 14px;
+  cursor: pointer;
+  padding: 4px;
+  line-height: 1;
+}
+.te-delete:active { color: var(--red); }
+
+/* sc-hours stat card */
+.stat-card.sc-hours::after { background: #6366f1; }
+.stat-card.sc-hours .stat-num { color: #6366f1; }
+
+/* ===== LOGIN SCREEN ===== */
+#login-screen {
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  z-index: 500;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: calc(var(--safe-top) + 24px) 24px calc(var(--safe-bottom) + 24px);
+  gap: 20px;
+}
+.login-logo {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 36px;
+  font-weight: 800;
+  letter-spacing: 3px;
+  color: var(--accent);
+  text-transform: uppercase;
+  text-align: center;
+}
+.login-logo span { color: var(--text-muted); font-weight: 400; }
+.login-tagline {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  text-align: center;
+  margin-top: -10px;
+}
+.login-icon { font-size: 52px; line-height: 1; }
+.login-prompt {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  text-align: center;
+}
+.login-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  max-width: 360px;
+}
+.login-emp-btn {
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 12px;
+  padding: 16px 18px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  cursor: pointer;
+  transition: all 0.15s;
+  width: 100%;
+  text-align: left;
+}
+.login-emp-btn:active { transform: scale(0.97); }
+.login-emp-avatar {
+  width: 46px; height: 46px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 18px;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+.login-emp-info { flex: 1; }
+.login-emp-name {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: var(--text);
+  margin-bottom: 2px;
+}
+.login-emp-role {
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+}
+.login-emp-arrow {
+  font-size: 20px;
+  color: var(--text-dim);
+}
+
+/* current user badge in topbar */
+.user-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  border-radius: 20px;
+  padding: 4px 10px 4px 4px;
+  cursor: pointer;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+.user-badge:active { opacity: 0.7; }
+.user-badge-avatar {
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 10px;
+  font-weight: 800;
+}
+.user-badge-name {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+}
+
+/* hidden file input */
+#photoInput { display: none; }
+
+/* ===== ADD TO HOME SCREEN BANNER ===== */
+#a2hs-banner {
+  position: fixed;
+  bottom: calc(var(--nav-h) + var(--safe-bottom) + 12px);
+  left: 12px; right: 12px;
+  background: var(--surface);
+  border: 1px solid var(--accent);
+  border-radius: 14px;
+  padding: 14px 16px;
+  display: none;
+  align-items: center;
+  gap: 12px;
+  z-index: 90;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  animation: slideUp 0.3s ease;
+  max-width: 560px;
+  margin: 0 auto;
+}
+#a2hs-banner.show { display: flex; }
+.a2hs-icon { font-size: 28px; flex-shrink: 0; }
+.a2hs-text { flex: 1; }
+.a2hs-title {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 2px;
+}
+.a2hs-sub {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+.a2hs-sub b { color: var(--text); }
+.a2hs-close {
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  font-size: 18px;
+  cursor: pointer;
+  padding: 4px;
+  flex-shrink: 0;
+  line-height: 1;
+}
+.a2hs-arrow {
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0; height: 0;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-top: 10px solid var(--accent);
+}
+</style>
+</head>
+<body>
+
+<!-- ===== LOGIN SCREEN ===== -->
+<div id="login-screen">
+  <div class="login-logo">Pump<span>Track</span></div>
+  <div class="login-tagline">Workshop Service Manager</div>
+  <div class="login-icon">👷</div>
+  <div class="login-prompt">Who are you?</div>
+  <div class="login-cards">
+    <button class="login-emp-btn" onclick="loginAs('Geoffrey Wright','GW','#6366f1')" style="border-color:rgba(99,102,241,0.3)">
+      <div class="login-emp-avatar" style="background:rgba(99,102,241,0.2);color:#6366f1">GW</div>
+      <div class="login-emp-info">
+        <div class="login-emp-name">Geoffrey Wright</div>
+        <div class="login-emp-role">Workshop Technician</div>
+      </div>
+      <div class="login-emp-arrow">›</div>
+    </button>
+    <button class="login-emp-btn" onclick="loginAs('Julian Banovich','JB','#06b6d4')" style="border-color:rgba(6,182,212,0.3)">
+      <div class="login-emp-avatar" style="background:rgba(6,182,212,0.2);color:#06b6d4">JB</div>
+      <div class="login-emp-info">
+        <div class="login-emp-name">Julian Banovich</div>
+        <div class="login-emp-role">Workshop Technician</div>
+      </div>
+      <div class="login-emp-arrow">›</div>
+    </button>
+    <button class="login-emp-btn" onclick="loginAs('Ciaran Doherty','CD','#ec4899')" style="border-color:rgba(236,72,153,0.3)">
+      <div class="login-emp-avatar" style="background:rgba(236,72,153,0.2);color:#ec4899">CD</div>
+      <div class="login-emp-info">
+        <div class="login-emp-name">Ciaran Doherty</div>
+        <div class="login-emp-role">Workshop Technician</div>
+      </div>
+      <div class="login-emp-arrow">›</div>
+    </button>
+  </div>
+</div>
+
+<div id="app" style="display:none">
+
+  <!-- ===== HOME SCREEN ===== -->
+  <div class="screen active" id="screen-home">
+    <div class="topbar">
+      <div class="topbar-logo">Pump<span>Track</span></div>
+      <div class="user-badge" id="user-badge" onclick="showLoginScreen()" title="Switch user">
+        <div class="user-badge-avatar" id="user-badge-avatar" style="background:rgba(99,102,241,0.2);color:#6366f1">GW</div>
+        <div class="user-badge-name" id="user-badge-name">Geoffrey</div>
+      </div>
+      <button class="topbar-action" onclick="openAddSheet()" style="margin-left:8px">+ NEW JOB</button>
+    </div>
+    <div class="scroll-area">
+      <div class="home-hero">
+        <div class="home-greeting">Workshop Dashboard</div>
+        <div class="home-date" id="home-date"></div>
+        <div class="stats-row">
+          <div class="stat-card sc-total"><div class="stat-num" id="st-total">0</div><div class="stat-lbl">Total</div></div>
+          <div class="stat-card sc-active"><div class="stat-num" id="st-active">0</div><div class="stat-lbl">Active</div></div>
+          <div class="stat-card sc-hours"><div class="stat-num" id="st-hours">0</div><div class="stat-lbl">Hrs Today</div></div>
+          <div class="stat-card sc-urgent"><div class="stat-num" id="st-urgent">0</div><div class="stat-lbl">Critical</div></div>
+        </div>
+      </div>
+      <div class="section-head">
+        Priority Queue
+        <button class="section-head-link" onclick="showScreen('jobs')">View All →</button>
+      </div>
+      <div class="priority-queue" id="home-queue"></div>
+      <div style="height:16px"></div>
+    </div>
+  </div>
+
+  <!-- ===== JOBS LIST SCREEN ===== -->
+  <div class="screen" id="screen-jobs">
+    <div class="topbar">
+      <div class="topbar-title">All Jobs</div>
+      <button class="topbar-action" onclick="openAddSheet()">+ Add</button>
+    </div>
+    <div class="search-bar">
+      <div class="search-input-wrap">
+        <span class="search-icon">⌕</span>
+        <input type="search" id="jobSearch" placeholder="Search jobs, customers, pumps..." oninput="renderJobsList()">
+      </div>
+    </div>
+    <div class="filter-chips" id="filterChips"><div class="chip active" data-filter="" onclick="setChipFilter('')">All</div><div class="chip " data-filter="p1" onclick="setChipFilter('p1')">P1 Critical</div><div class="chip " data-filter="p2" onclick="setChipFilter('p2')">P2 High</div><div class="chip " data-filter="progress" onclick="setChipFilter('progress')">In Progress</div><div class="chip " data-filter="parts" onclick="setChipFilter('parts')">Waiting Parts</div><div class="chip " data-filter="quote" onclick="setChipFilter('quote')">Quote</div><div class="chip " data-filter="pending" onclick="setChipFilter('pending')">Pending</div><div class="chip " data-filter="completed" onclick="setChipFilter('completed')">Completed</div></div>
+    <div class="scroll-area">
+      <div class="jobs-list" id="jobs-list"></div>
+    </div>
+  </div>
+
+  <!-- ===== JOB DETAIL SCREEN ===== -->
+  <div class="screen" id="screen-detail">
+    <div class="topbar">
+      <button class="back-btn" onclick="goBack()">‹</button>
+      <div class="topbar-title" id="detail-topbar-title">Job Detail</div>
+      <button class="topbar-action" onclick="saveDetailEdits()" style="font-size:12px">SAVE</button>
+    </div>
+    <div class="detail-hero">
+      <div class="detail-job-num" id="d-jobnum"></div>
+      <div class="detail-customer" id="d-customer"></div>
+      <div class="detail-pump" id="d-pump"></div>
+      <div class="detail-badges" id="d-badges"></div>
+    </div>
+    <div class="detail-tabs">
+      <button class="detail-tab active" onclick="switchTab('info')">📋 Info</button>
+      <button class="detail-tab" onclick="switchTab('photos')">📷 Photos</button>
+      <button class="detail-tab" onclick="switchTab('notes')">💬 Notes</button>
+    </div>
+    <div class="scroll-area" id="detail-scroll">
+
+      <!-- INFO TAB -->
+      <div class="detail-tab-content active" id="tab-info">
+        <div class="info-grid">
+          <div class="info-field">
+            <div class="field-label">Job Number</div>
+            <input class="edit-field" id="e-jobnum" type="number" style="background:none;border:none;padding:0;font-size:14px;font-weight:600;color:var(--accent)">
+          </div>
+          <div class="info-field">
+            <div class="field-label">Date Received</div>
+            <input class="edit-field" id="e-date" type="date" style="background:none;border:none;padding:0;font-size:13px;color:var(--text)">
+          </div>
+          <div class="info-field full">
+            <div class="field-label">Customer</div>
+            <input class="edit-field" id="e-customer" type="text">
+          </div>
+          <div class="info-field full">
+            <div class="field-label">Pump Type</div>
+            <input class="edit-field" id="e-pump" type="text">
+          </div>
+          <div class="info-field full">
+            <div class="field-label">Progress / Stage</div>
+            <input class="edit-field" id="e-progress" type="text">
+          </div>
+          <div class="info-field full">
+            <div class="field-label">Status</div>
+            <select class="edit-field" id="e-status">
+              <option value="quote" selected="selected">Quote</option>
+              <option value="pending">Pending</option>
+              <option value="progress">In Progress</option>
+              <option value="parts">Waiting for Parts</option>
+              <option value="completed">Completed</option>
+            </select>
+          </div>
+        </div>
+        <div style="padding: 0 16px 4px">
+          <div class="form-label" style="margin-bottom:8px">Priority</div>
+          <div class="priority-row" id="detail-priority-row"></div>
+        </div>
+        <div style="padding:16px">
+          <button onclick="confirmDeleteJob()" style="width:100%;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);color:var(--red);font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:12px;border-radius:8px;cursor:pointer;">
+            🗑 DELETE JOB
+          </button>
+        </div>
+      </div>
+
+      <!-- PHOTOS TAB -->
+      <div class="detail-tab-content" id="tab-photos">
+        <div class="photos-section">
+          <label class="photo-upload-btn" for="photoInput">
+            <span class="upload-icon">📷</span>
+            <span class="upload-text">Add Photos</span>
+            <span class="upload-sub">Tap to take photo or choose from library</span>
+          </label>
+          <input type="file" id="photoInput" accept="image/*" multiple="" onchange="handlePhotoUpload(event)">
+          <div class="photo-grid" id="photo-grid">
+            <div class="no-photos" style="grid-column:1/-1">No photos yet</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- NOTES TAB -->
+      <div class="detail-tab-content" id="tab-notes">
+        <div class="notes-section">
+          <div class="note-composer">
+            <textarea class="note-textarea" id="note-input" placeholder="Add a workshop note... e.g. 'Shaft bearing replaced, awaiting alignment check'"></textarea>
+            <div class="note-composer-footer">
+              <button class="post-btn" onclick="postNote()">POST NOTE</button>
+            </div>
+          </div>
+          <div class="notes-log" id="notes-log"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ===== TIME TRACKING SCREEN ===== -->
+  <div class="screen" id="screen-time">
+    <div class="topbar">
+      <div class="topbar-title">Hours Tracker</div>
+      <button class="topbar-action" onclick="openTimeSheet()">+ Log Hours</button>
+    </div>
+    <div class="scroll-area">
+      <div style="padding:14px 16px 0">
+        <div class="time-emp-cards" id="time-emp-cards"></div>
+      </div>
+      <div style="padding:12px 16px 0;display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+        <select class="edit-field" id="time-filter-emp" onchange="renderTimeEntries()" style="flex:1;min-width:140px;max-width:220px;">
+          <option value="" selected="selected">All Employees</option>
+          <option value="Geoffrey Wright">Geoffrey Wright</option>
+          <option value="Julian Banovich">Julian Banovich</option>
+          <option value="Ciaran Doherty">Ciaran Doherty</option>
+        </select>
+        <select class="edit-field" id="time-filter-period" onchange="renderTimeEntries()" style="flex:1;min-width:120px;max-width:160px;">
+          <option value="week" selected="selected">This Week</option>
+          <option value="month">This Month</option>
+          <option value="all">All Time</option>
+        </select>
+      </div>
+      <div style="padding:10px 16px 0;" id="time-weekly-wrap"></div>
+      <div style="padding:6px 16px;" id="time-entries-list"></div>
+      <div style="height:16px"></div>
+    </div>
+  </div>
+
+  <!-- ===== BOTTOM NAV ===== -->
+  <div class="bottom-nav">
+    <button class="nav-item active" id="nav-home" onclick="showScreen('home')">
+      <span class="nav-icon">🏠</span>
+      <span class="nav-label">Home</span>
+    </button>
+    <button class="nav-item" id="nav-jobs" onclick="showScreen('jobs')" style="position:relative">
+      <span class="nav-icon">🔧</span>
+      <span class="nav-label">Jobs</span>
+      <span class="nav-badge" id="active-badge">0</span>
+    </button>
+    <button class="nav-item" id="nav-time" onclick="showScreen('time')">
+      <span class="nav-icon">⏱</span>
+      <span class="nav-label">Hours</span>
+    </button>
+    <button class="nav-item" id="nav-done" onclick="filterAndShowJobs('completed')">
+      <span class="nav-icon">✅</span>
+      <span class="nav-label">Done</span>
+    </button>
+  </div>
+
+</div>
+
+<!-- FAB -->
+<button class="fab" onclick="openAddSheet()" id="fab-btn">＋</button>
+
+<!-- ADD JOB SHEET -->
+<div class="sheet-overlay" id="add-sheet" onclick="handleSheetOverlay(event)">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header">
+      <div class="sheet-title" id="sheet-title">New Job</div>
+      <button class="sheet-close" onclick="closeAddSheet()">✕</button>
+    </div>
+    <div class="sheet-body">
+      <div class="form-group">
+        <label class="form-label">Job Number</label>
+        <input class="edit-field" id="s-jobnum" type="number" placeholder="e.g. 10160">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Date Received</label>
+        <input class="edit-field" id="s-date" type="date">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Customer</label>
+        <input class="edit-field" id="s-customer" type="text" placeholder="Customer name">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Pump Type</label>
+        <input class="edit-field" id="s-pump" type="text" placeholder="e.g. Horizontal Split Multistage">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Priority</label>
+        <div class="sheet-p-row" id="sheet-p-row">
+          <div class="sheet-p-btn" data-p="1" onclick="sheetSelectP(1)">P1<br>CRITICAL</div>
+          <div class="sheet-p-btn" data-p="2" onclick="sheetSelectP(2)">P2<br>HIGH</div>
+          <div class="sheet-p-btn" data-p="3" onclick="sheetSelectP(3)">P3<br>MEDIUM</div>
+          <div class="sheet-p-btn" data-p="4" onclick="sheetSelectP(4)">P4<br>LOW</div>
+          <div class="sheet-p-btn" data-p="5" onclick="sheetSelectP(5)">P5<br>BACKLOG</div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Status</label>
+        <select class="edit-field" id="s-status">
+          <option value="quote">Quote</option>
+          <option value="pending">Pending</option>
+          <option value="progress" selected="selected">In Progress</option>
+          <option value="parts">Waiting for Parts</option>
+          <option value="completed">Completed</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Progress / Stage</label>
+        <input class="edit-field" id="s-progress" type="text" placeholder="e.g. Prepare for Assembly">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Notes</label>
+        <textarea class="edit-field" id="s-notes" rows="3" placeholder="Initial notes..." style="resize:none;font-family:'Barlow',sans-serif"></textarea>
+      </div>
+      <button class="sheet-save-btn" onclick="saveNewJob()">Save Job</button>
+    </div>
+  </div>
+</div>
+
+<!-- TIME LOG SHEET -->
+<div class="sheet-overlay" id="time-sheet" onclick="if(event.target===this)closeTimeSheet()">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header">
+      <div class="sheet-title">Log Hours</div>
+      <button class="sheet-close" onclick="closeTimeSheet()">✕</button>
+    </div>
+    <div class="sheet-body">
+      <div class="form-group">
+        <label class="form-label">Employee</label>
+        <select class="edit-field" id="t-emp">
+          <option value="Geoffrey Wright" selected="selected">Geoffrey Wright</option>
+          <option value="Julian Banovich">Julian Banovich</option>
+          <option value="Ciaran Doherty">Ciaran Doherty</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Date</label>
+        <input class="edit-field" id="t-date" type="date">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Job Number (optional)</label>
+        <select class="edit-field" id="t-job">
+          <option value="" selected="selected">— General / No specific job —</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Hours Worked</label>
+        <input class="edit-field" id="t-hours" type="number" step="0.5" min="0.5" max="24" placeholder="e.g. 7.5">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Work Description</label>
+        <textarea class="edit-field" id="t-desc" rows="3" style="resize:none;font-family:'Barlow',sans-serif" placeholder="e.g. Strip and inspect pump bearings, measure shaft runout..."></textarea>
+      </div>
+      <button class="sheet-save-btn" onclick="saveTimeEntry()">Save Entry</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD TO HOME SCREEN BANNER -->
+<div id="a2hs-banner">
+  <div class="a2hs-icon">📲</div>
+  <div class="a2hs-text">
+    <div class="a2hs-title">Install as App</div>
+    <div class="a2hs-sub">Tap <b>Share</b> then <b>"Add to Home Screen"</b> to use PumpTrack like a native app</div>
+  </div>
+  <button class="a2hs-close" onclick="dismissA2HS()">✕</button>
+  <div class="a2hs-arrow"></div>
+</div>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <img id="lightbox-img" src="" alt="">
+  <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+</div>
+
+<script>
+// ========== EMPLOYEES ==========
+const EMPLOYEES = [
+  { key: 'Geoffrey Wright',  initials: 'GW', cls: 'tec-g', color: '#6366f1' },
+  { key: 'Julian Banovich',  initials: 'JB', cls: 'tec-j', color: '#06b6d4' },
+  { key: 'Ciaran Doherty',   initials: 'CD', cls: 'tec-c', color: '#ec4899' },
+];
+
+// ========== CURRENT USER ==========
+let currentUser = null; // set on login
+
+function loginAs(name, initials, color) {
+  currentUser = { name, initials, color };
+  // Persist selection
+  try { localStorage.setItem('pumptrack_user', JSON.stringify(currentUser)); } catch(e) {}
+  // Update badge in topbar
+  const avatar = document.getElementById('user-badge-avatar');
+  const label  = document.getElementById('user-badge-name');
+  avatar.textContent = initials;
+  avatar.style.background = color + '33';
+  avatar.style.color = color;
+  label.textContent = name.split(' ')[0];
+  // Hide login, show app
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app').style.display = '';
+  // Show install prompt if appropriate
+  initA2HS();
+  renderHome();
+  updateBadge();
+  buildFilterChips();
+}
+
+function showLoginScreen() {
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('app').style.display = 'none';
+}
+
+// ========== LOCALSTORAGE HELPERS ==========
+function saveData() {
+  try {
+    // Save jobs without photo data in the main key to avoid quota, photos separate
+    const jobsNoPhotos = jobs.map(j => ({ ...j, photos: [] }));
+    localStorage.setItem('pumptrack_jobs', JSON.stringify(jobsNoPhotos));
+    localStorage.setItem('pumptrack_nextId', String(nextId));
+    // Save photos per job separately (large base64 data)
+    jobs.forEach(j => {
+      if (j.photos && j.photos.length) {
+        try {
+          localStorage.setItem(`pumptrack_photos_${j.id}`, JSON.stringify(j.photos));
+        } catch(e) {
+          // Photo storage full — silently skip
+        }
+      } else {
+        localStorage.removeItem(`pumptrack_photos_${j.id}`);
+      }
+    });
+    localStorage.setItem('pumptrack_time', JSON.stringify(timeEntries));
+    localStorage.setItem('pumptrack_timeNextId', String(timeNextId));
+  } catch(e) {
+    console.warn('Storage save error:', e);
+  }
+}
+
+function loadData() {
+  try {
+    const savedJobs = localStorage.getItem('pumptrack_jobs');
+    if (savedJobs) {
+      jobs = JSON.parse(savedJobs);
+      // Restore photos from separate keys
+      jobs.forEach(j => {
+        const ph = localStorage.getItem(`pumptrack_photos_${j.id}`);
+        j.photos = ph ? JSON.parse(ph) : [];
+        if (!j.notesLog) j.notesLog = [];
+      });
+      nextId = parseInt(localStorage.getItem('pumptrack_nextId') || '8');
+    }
+    const savedTime = localStorage.getItem('pumptrack_time');
+    if (savedTime) {
+      timeEntries = JSON.parse(savedTime);
+      timeNextId = parseInt(localStorage.getItem('pumptrack_timeNextId') || '1');
+    }
+  } catch(e) {
+    console.warn('Storage load error:', e);
+  }
+}
+
+// ========== DEFAULT DATA ==========
+let jobs = [
+  { id:1, jobNumber:10134, dateReceived:'', customer:'WORSLEY SOUTH 32', pumpType:'4EC HORIZONTAL SPLIT MULTISTAGE', progress:'FINAL PACKAGING', notes:'SENT TO CUSTOMER', status:'completed', priority:4, photos:[], notesLog:[] },
+  { id:2, jobNumber:10135, dateReceived:'2025-04-28', customer:'WORLEY TELFER', pumpType:'PACO VERTICAL SPLIT CASE', progress:'PREPARE FOR ASSEMBLY', notes:'BUILD IN PROGRESS', status:'progress', priority:2, photos:[], notesLog:[] },
+  { id:3, jobNumber:10154, dateReceived:'2025-11-01', customer:'ONSLOW SALT', pumpType:'FLOMAX AXIAL FLOW PUMP', progress:'ASSEMBLE', notes:'AT MTP', status:'progress', priority:2, photos:[], notesLog:[] },
+  { id:4, jobNumber:10156, dateReceived:'2025-11-05', customer:'ONSLOW SALT', pumpType:'VS50 VERTICAL SUMP PUMP', progress:'PREPARE FOR ASSEMBLY', notes:'NEED TO ORDER SHAFT', status:'parts', priority:1, photos:[], notesLog:[{text:'Shaft needs to be ordered — lead time ~2 weeks', time: Date.now() - 86400000*2}] },
+  { id:5, jobNumber:10157, dateReceived:'2025-12-11', customer:'ONSLOW SALT', pumpType:'MM200 VERTICAL SUMP PUMP', progress:'ASSEMBLED', notes:'AT SURFACE TREATMENT FACILITY', status:'progress', priority:3, photos:[], notesLog:[] },
+  { id:6, jobNumber:10158, dateReceived:'2025-10-01', customer:'WORSLEY SOUTH 32', pumpType:'SOMEFLU CHEMICAL PROCESS PUMP', progress:'QUOTED', notes:'WAITING FOR PO', status:'quote', priority:3, photos:[], notesLog:[] },
+  { id:7, jobNumber:10159, dateReceived:'2026-01-28', customer:'ONSLOW SALT', pumpType:'MM100 HORIZONTAL SLURRY PUMP', progress:'QUOTE', notes:'', status:'quote', priority:5, photos:[], notesLog:[] },
+];
+let nextId = 8;
+let timeEntries = [];
+let timeNextId = 1;
+
+// Load persisted data (overwrites defaults if saved data exists)
+loadData();
+
+let currentJobId = null;
+let currentScreen = 'home';
+let prevScreen = 'home';
+let sheetPriority = 3;
+let detailPriority = 3;
+let activeFilter = '';
+let activeTab = 'info';
+
+const STATUS = {
+  completed: { label:'Completed',         cls:'sp-completed' },
+  progress:  { label:'In Progress',       cls:'sp-progress' },
+  pending:   { label:'Pending',           cls:'sp-pending' },
+  quote:     { label:'Quote',             cls:'sp-quote' },
+  parts:     { label:'Waiting for Parts', cls:'sp-parts' },
+};
+
+const PRIO = {
+  1:{ label:'P1 CRITICAL', cls:'pp-1', color:'var(--p1)' },
+  2:{ label:'P2 HIGH',     cls:'pp-2', color:'var(--p2)' },
+  3:{ label:'P3 MEDIUM',   cls:'pp-3', color:'var(--p3)' },
+  4:{ label:'P4 LOW',      cls:'pp-4', color:'var(--p4)' },
+  5:{ label:'P5 BACKLOG',  cls:'pp-5', color:'var(--p5)' },
+};
+
+// ========== SCREENS ==========
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById(`screen-${name}`).classList.add('active');
+  const ni = document.getElementById(`nav-${name}`);
+  if (ni) ni.classList.add('active');
+  const fab = document.getElementById('fab-btn');
+  fab.style.display = (name === 'detail' || name === 'time') ? 'none' : 'flex';
+  if (name !== 'detail') prevScreen = currentScreen;
+  currentScreen = name;
+  if (name === 'home') renderHome();
+  if (name === 'jobs') renderJobsList();
+  if (name === 'time') renderTimeScreen();
+  updateBadge();
+}
+
+function goBack() {
+  showScreen(prevScreen === 'detail' ? 'jobs' : prevScreen);
+}
+
+function filterAndShowJobs(filter) {
+  activeFilter = filter;
+  showScreen('jobs');
+  buildFilterChips();
+  renderJobsList();
+}
+
+// ========== HOME ==========
+function renderHome() {
+  const now = new Date();
+  document.getElementById('home-date').textContent = now.toLocaleDateString('en-AU', {weekday:'long', day:'numeric', month:'long'});
+  document.getElementById('st-total').textContent = jobs.length;
+  document.getElementById('st-active').textContent = jobs.filter(j=>j.status==='progress').length;
+  document.getElementById('st-urgent').textContent = jobs.filter(j=>j.priority<=2 && j.status!=='completed').length;
+
+  // Hours today
+  const todayStr = now.toISOString().split('T')[0];
+  const hrsToday = timeEntries.filter(e => e.date === todayStr).reduce((s,e) => s + e.hours, 0);
+  document.getElementById('st-hours').textContent = hrsToday % 1 === 0 ? hrsToday : hrsToday.toFixed(1);
+
+  const queue = [...jobs].filter(j=>j.status!=='completed').sort((a,b)=>a.priority-b.priority).slice(0,6);
+  const el = document.getElementById('home-queue');
+  if (!queue.length) {
+    el.innerHTML = `<div class="empty-list"><div class="empty-icon">🎉</div><p>All jobs completed!</p></div>`;
+    return;
+  }
+  el.innerHTML = queue.map((j,i) => jobCardHTML(j, i)).join('');
+}
+
+// ========== JOBS LIST ==========
+function buildFilterChips() {
+  const chips = [
+    {label:'All', filter:''},
+    {label:'P1 Critical', filter:'p1'},
+    {label:'P2 High', filter:'p2'},
+    {label:'In Progress', filter:'progress'},
+    {label:'Waiting Parts', filter:'parts'},
+    {label:'Quote', filter:'quote'},
+    {label:'Pending', filter:'pending'},
+    {label:'Completed', filter:'completed'},
+  ];
+  document.getElementById('filterChips').innerHTML = chips.map(c =>
+    `<div class="chip ${c.filter===activeFilter?'active':''}" data-filter="${c.filter}" onclick="setChipFilter('${c.filter}')">${c.label}</div>`
+  ).join('');
+}
+
+function setChipFilter(f) {
+  activeFilter = f;
+  buildFilterChips();
+  renderJobsList();
+}
+
+function renderJobsList() {
+  buildFilterChips();
+  const q = (document.getElementById('jobSearch')?.value || '').toLowerCase();
+  let filtered = jobs.filter(j => {
+    if (q && !`${j.jobNumber} ${j.customer} ${j.pumpType} ${j.progress}`.toLowerCase().includes(q)) return false;
+    if (activeFilter === 'p1') return j.priority === 1;
+    if (activeFilter === 'p2') return j.priority === 2;
+    if (activeFilter === 'progress') return j.status === 'progress';
+    if (activeFilter === 'parts') return j.status === 'parts';
+    if (activeFilter === 'quote') return j.status === 'quote';
+    if (activeFilter === 'pending') return j.status === 'pending';
+    if (activeFilter === 'completed') return j.status === 'completed';
+    return true;
+  }).sort((a,b) => a.priority - b.priority || b.jobNumber - a.jobNumber);
+
+  const el = document.getElementById('jobs-list');
+  if (!filtered.length) {
+    el.innerHTML = `<div class="empty-list"><div class="empty-icon">🔍</div><p>No jobs match your search.</p></div>`;
+    return;
+  }
+  el.innerHTML = filtered.map((j,i) => jobCardHTML(j, i)).join('');
+}
+
+function jobCardHTML(j, i) {
+  const s = STATUS[j.status] || STATUS.progress;
+  const p = PRIO[j.priority];
+  const photoCount = j.photos ? j.photos.length : 0;
+  const noteCount = j.notesLog ? j.notesLog.length : 0;
+  return `<div class="job-card" style="animation-delay:${i*40}ms" onclick="openJob(${j.id})">
+    <div class="job-card-inner">
+      <div class="job-card-priority" style="background:${p.color}"></div>
+      <div class="job-card-body">
+        <div class="job-card-top">
+          <span class="job-num-tag">#${j.jobNumber}</span>
+          <span class="priority-pill ${p.cls}">${p.label}</span>
+        </div>
+        <div class="job-customer">${j.customer}</div>
+        <div class="job-pump">${j.pumpType}</div>
+        <div class="job-card-footer">
+          <span class="status-pill ${s.cls}">${s.label}</span>
+          ${photoCount > 0 ? `<span class="photo-count">📷 ${photoCount}</span>` : ''}
+          ${noteCount > 0 ? `<span class="photo-count">💬 ${noteCount}</span>` : ''}
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ========== JOB DETAIL ==========
+function openJob(id) {
+  currentJobId = id;
+  const j = jobs.find(x => x.id === id);
+  if (!j) return;
+  prevScreen = currentScreen;
+  showScreen('detail');
+
+  document.getElementById('detail-topbar-title').textContent = `#${j.jobNumber}`;
+  document.getElementById('d-jobnum').textContent = `JOB #${j.jobNumber}`;
+  document.getElementById('d-customer').textContent = j.customer;
+  document.getElementById('d-pump').textContent = j.pumpType;
+
+  const s = STATUS[j.status] || STATUS.progress;
+  const p = PRIO[j.priority];
+  document.getElementById('d-badges').innerHTML =
+    `<span class="status-pill ${s.cls}">${s.label}</span><span class="priority-pill ${p.cls}">${p.label}</span>`;
+
+  document.getElementById('e-jobnum').value = j.jobNumber;
+  document.getElementById('e-date').value = j.dateReceived || '';
+  document.getElementById('e-customer').value = j.customer;
+  document.getElementById('e-pump').value = j.pumpType;
+  document.getElementById('e-progress').value = j.progress;
+  document.getElementById('e-status').value = j.status;
+
+  detailPriority = j.priority;
+  renderDetailPriority();
+  switchTab('info');
+  renderPhotos();
+  renderNotes();
+}
+
+function saveDetailEdits() {
+  const j = jobs.find(x => x.id === currentJobId);
+  if (!j) return;
+  j.jobNumber = parseInt(document.getElementById('e-jobnum').value) || j.jobNumber;
+  j.dateReceived = document.getElementById('e-date').value;
+  j.customer = document.getElementById('e-customer').value.trim().toUpperCase();
+  j.pumpType = document.getElementById('e-pump').value.trim().toUpperCase();
+  j.progress = document.getElementById('e-progress').value.trim().toUpperCase();
+  j.status = document.getElementById('e-status').value;
+  j.priority = detailPriority;
+
+  document.getElementById('detail-topbar-title').textContent = `#${j.jobNumber}`;
+  document.getElementById('d-jobnum').textContent = `JOB #${j.jobNumber}`;
+  document.getElementById('d-customer').textContent = j.customer;
+  document.getElementById('d-pump').textContent = j.pumpType;
+  const s = STATUS[j.status] || STATUS.progress;
+  const p = PRIO[j.priority];
+  document.getElementById('d-badges').innerHTML =
+    `<span class="status-pill ${s.cls}">${s.label}</span><span class="priority-pill ${p.cls}">${p.label}</span>`;
+
+  saveData();
+  showToast('Job saved ✓');
+  updateBadge();
+}
+
+function renderDetailPriority() {
+  const row = document.getElementById('detail-priority-row');
+  row.innerHTML = [1,2,3,4,5].map(p => {
+    const labels = ['','CRITICAL','HIGH','MEDIUM','LOW','BACKLOG'];
+    const active = detailPriority === p ? `active-${p}` : '';
+    return `<div class="p-btn ${active}" onclick="setDetailPriority(${p})">P${p}<br>${labels[p]}</div>`;
+  }).join('');
+}
+
+function setDetailPriority(p) {
+  detailPriority = p;
+  renderDetailPriority();
+}
+
+function confirmDeleteJob() {
+  if (confirm(`Delete job #${jobs.find(x=>x.id===currentJobId)?.jobNumber}? This cannot be undone.`)) {
+    const id = currentJobId;
+    localStorage.removeItem(`pumptrack_photos_${id}`);
+    jobs = jobs.filter(j => j.id !== id);
+    saveData();
+    showScreen(prevScreen);
+    updateBadge();
+    showToast('Job deleted');
+  }
+}
+
+// ========== TABS ==========
+function switchTab(name) {
+  activeTab = name;
+  document.querySelectorAll('.detail-tab').forEach((t,i) => {
+    const tabs = ['info','photos','notes'];
+    t.classList.toggle('active', tabs[i] === name);
+  });
+  document.querySelectorAll('.detail-tab-content').forEach(c => c.classList.remove('active'));
+  document.getElementById(`tab-${name}`).classList.add('active');
+}
+
+// ========== PHOTOS ==========
+function handlePhotoUpload(event) {
+  const j = jobs.find(x => x.id === currentJobId);
+  if (!j) return;
+  const files = Array.from(event.target.files);
+  files.forEach(file => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      j.photos.push({ id: Date.now() + Math.random(), src: e.target.result, time: Date.now() });
+      renderPhotos();
+      saveData();
+    };
+    reader.readAsDataURL(file);
+  });
+  event.target.value = '';
+}
+
+function renderPhotos() {
+  const j = jobs.find(x => x.id === currentJobId);
+  const grid = document.getElementById('photo-grid');
+  if (!j || !j.photos.length) {
+    grid.innerHTML = `<div class="no-photos" style="grid-column:1/-1">📷 No photos yet. Tap above to add.</div>`;
+    return;
+  }
+  grid.innerHTML = j.photos.map(ph => `
+    <div class="photo-thumb" onclick="openLightbox('${ph.src}')">
+      <img src="${ph.src}" alt="Photo">
+      <div class="photo-thumb-overlay">
+        <button class="photo-del-btn" onclick="event.stopPropagation();deletePhoto('${ph.id}')">✕</button>
+      </div>
+    </div>`).join('');
+}
+
+function deletePhoto(pid) {
+  const j = jobs.find(x => x.id === currentJobId);
+  if (!j) return;
+  j.photos = j.photos.filter(p => p.id != pid);
+  renderPhotos();
+  saveData();
+}
+
+function openLightbox(src) {
+  document.getElementById('lightbox-img').src = src;
+  document.getElementById('lightbox').classList.add('open');
+}
+function closeLightbox() {
+  document.getElementById('lightbox').classList.remove('open');
+}
+
+// ========== NOTES ==========
+function postNote() {
+  const input = document.getElementById('note-input');
+  const text = input.value.trim();
+  if (!text) return;
+  const j = jobs.find(x => x.id === currentJobId);
+  if (!j) return;
+  j.notesLog.unshift({ text, time: Date.now() });
+  input.value = '';
+  renderNotes();
+  saveData();
+  showToast('Note added ✓');
+}
+
+function renderNotes() {
+  const j = jobs.find(x => x.id === currentJobId);
+  const el = document.getElementById('notes-log');
+  if (!j || !j.notesLog.length) {
+    el.innerHTML = `<div class="no-notes">💬 No notes yet. Add the first update above.</div>`;
+    return;
+  }
+  el.innerHTML = j.notesLog.map(n => {
+    const d = new Date(n.time);
+    const timeStr = d.toLocaleString('en-AU', {day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+    return `<div class="note-entry">
+      <div class="note-meta"><span class="note-author">Workshop</span> · ${timeStr}</div>
+      <div class="note-body">${escapeHTML(n.text)}</div>
+    </div>`;
+  }).join('');
+}
+
+function escapeHTML(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+}
+
+// ========== ADD JOB SHEET ==========
+function openAddSheet() {
+  sheetPriority = 3;
+  sheetSelectP(3);
+  document.getElementById('s-jobnum').value = jobs.length ? Math.max(...jobs.map(j=>j.jobNumber)) + 1 : 10160;
+  document.getElementById('s-date').value = new Date().toISOString().split('T')[0];
+  document.getElementById('s-customer').value = '';
+  document.getElementById('s-pump').value = '';
+  document.getElementById('s-progress').value = '';
+  document.getElementById('s-notes').value = '';
+  document.getElementById('s-status').value = 'progress';
+  document.getElementById('add-sheet').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeAddSheet() {
+  document.getElementById('add-sheet').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function handleSheetOverlay(e) {
+  if (e.target === document.getElementById('add-sheet')) closeAddSheet();
+}
+
+function sheetSelectP(p) {
+  sheetPriority = p;
+  document.querySelectorAll('.sheet-p-btn').forEach(btn => {
+    const bp = parseInt(btn.dataset.p);
+    btn.className = 'sheet-p-btn' + (bp === p ? ` active-${p}` : '');
+  });
+}
+
+function saveNewJob() {
+  const jobNumber = parseInt(document.getElementById('s-jobnum').value);
+  const customer = document.getElementById('s-customer').value.trim().toUpperCase();
+  const pumpType = document.getElementById('s-pump').value.trim().toUpperCase();
+  if (!jobNumber || !customer || !pumpType) {
+    showToast('Please fill Job Number, Customer & Pump Type', true);
+    return;
+  }
+  const noteText = document.getElementById('s-notes').value.trim();
+  const notesLog = noteText ? [{ text: noteText, time: Date.now() }] : [];
+  jobs.push({
+    id: nextId++,
+    jobNumber,
+    dateReceived: document.getElementById('s-date').value,
+    customer,
+    pumpType,
+    progress: document.getElementById('s-progress').value.trim().toUpperCase(),
+    notes: noteText,
+    status: document.getElementById('s-status').value,
+    priority: sheetPriority,
+    photos: [],
+    notesLog,
+  });
+  saveData();
+  closeAddSheet();
+  updateBadge();
+  if (currentScreen === 'home') renderHome();
+  if (currentScreen === 'jobs') renderJobsList();
+  showToast('Job added ✓');
+}
+
+// ========== TIME TRACKING ==========
+function getWeekStart(date) {
+  const d = new Date(date);
+  const day = d.getDay(); // 0=Sun
+  const diff = d.getDate() - day + (day === 0 ? -6 : 1); // Mon
+  return new Date(d.setDate(diff)).toISOString().split('T')[0];
+}
+
+function getPeriodEntries(entries, period, empFilter) {
+  const now = new Date();
+  const todayStr = now.toISOString().split('T')[0];
+  const weekStart = getWeekStart(now);
+  const monthStart = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-01`;
+  return entries.filter(e => {
+    if (empFilter && e.employee !== empFilter) return false;
+    if (period === 'week') return e.date >= weekStart;
+    if (period === 'month') return e.date >= monthStart;
+    return true;
+  });
+}
+
+function renderTimeScreen() {
+  renderTimeEmployeeCards();
+  renderTimeWeeklyChart();
+  renderTimeEntries();
+  populateTimeJobSelect();
+}
+
+function renderTimeEmployeeCards() {
+  const now = new Date();
+  const weekStart = getWeekStart(now);
+  const el = document.getElementById('time-emp-cards');
+  el.innerHTML = EMPLOYEES.map(emp => {
+    const weekHrs = timeEntries
+      .filter(e => e.employee === emp.key && e.date >= weekStart)
+      .reduce((s,e) => s + e.hours, 0);
+    const fmt = weekHrs % 1 === 0 ? weekHrs : weekHrs.toFixed(1);
+    return `<div class="time-emp-card ${emp.cls}" onclick="filterByEmployee('${emp.key}')">
+      <div class="tec-avatar">${emp.initials}</div>
+      <div class="tec-name">${emp.key.split(' ')[0]}</div>
+      <div class="tec-hours">${fmt}</div>
+      <div class="tec-lbl">hrs / wk</div>
+    </div>`;
+  }).join('');
+}
+
+function filterByEmployee(emp) {
+  document.getElementById('time-filter-emp').value = emp;
+  renderTimeEntries();
+}
+
+function renderTimeWeeklyChart() {
+  const empFilter = document.getElementById('time-filter-emp')?.value || '';
+  const now = new Date();
+  // Build last 7 days
+  const days = [];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(now);
+    d.setDate(d.getDate() - i);
+    const str = d.toISOString().split('T')[0];
+    const lbl = d.toLocaleDateString('en-AU', {weekday:'short'}).slice(0,2);
+    const hrs = timeEntries
+      .filter(e => e.date === str && (!empFilter || e.employee === empFilter))
+      .reduce((s,e) => s + e.hours, 0);
+    days.push({ str, lbl, hrs });
+  }
+  const maxH = Math.max(...days.map(d=>d.hrs), 8);
+  const el = document.getElementById('time-weekly-wrap');
+  el.innerHTML = `<div class="weekly-chart">
+    <div class="weekly-chart-title">Last 7 Days${empFilter ? ' — ' + empFilter.split(' ')[0] : ''}</div>
+    <div class="weekly-bars">
+      ${days.map(d => {
+        const pct = maxH > 0 ? (d.hrs / maxH) * 54 : 0;
+        const isToday = d.str === now.toISOString().split('T')[0];
+        return `<div class="weekly-bar-wrap">
+          <div class="weekly-bar-val">${d.hrs > 0 ? (d.hrs % 1 === 0 ? d.hrs : d.hrs.toFixed(1)) : ''}</div>
+          <div class="weekly-bar" style="height:${Math.max(pct,d.hrs>0?4:2)}px;opacity:${isToday?1:0.5};background:${isToday?'var(--accent)':'var(--text-muted)'}"></div>
+          <div class="weekly-bar-lbl" style="color:${isToday?'var(--accent)':'var(--text-dim)'}">${d.lbl}</div>
+        </div>`;
+      }).join('')}
+    </div>
+  </div>`;
+}
+
+function renderTimeEntries() {
+  renderTimeEmployeeCards();
+  renderTimeWeeklyChart();
+  const empFilter = document.getElementById('time-filter-emp')?.value || '';
+  const period = document.getElementById('time-filter-period')?.value || 'week';
+  const filtered = getPeriodEntries(timeEntries, period, empFilter)
+    .slice().sort((a,b) => b.date.localeCompare(a.date) || b.id - a.id);
+
+  const el = document.getElementById('time-entries-list');
+  if (!filtered.length) {
+    el.innerHTML = `<div class="empty-list"><div class="empty-icon">⏱</div><p>No time entries yet.<br>Tap "+ Log Hours" to add one.</p></div>`;
+    return;
+  }
+
+  // Group by date
+  const grouped = {};
+  filtered.forEach(e => {
+    if (!grouped[e.date]) grouped[e.date] = [];
+    grouped[e.date].push(e);
+  });
+
+  const totalHrs = filtered.reduce((s,e) => s + e.hours, 0);
+  let html = `<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 2px 10px;">
+    <span style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;color:var(--text-muted);text-transform:uppercase;">${filtered.length} entries</span>
+    <span style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:800;color:var(--accent);">${totalHrs % 1 === 0 ? totalHrs : totalHrs.toFixed(1)} hrs total</span>
+  </div>`;
+
+  Object.entries(grouped).forEach(([date, entries]) => {
+    const d = new Date(date + 'T12:00:00');
+    const dateLabel = d.toLocaleDateString('en-AU', {weekday:'long', day:'numeric', month:'short'});
+    const dayTotal = entries.reduce((s,e) => s + e.hours, 0);
+    html += `<div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-muted);padding:8px 2px 4px;display:flex;justify-content:space-between;">
+      <span>${dateLabel}</span><span style="color:var(--accent)">${dayTotal % 1 === 0 ? dayTotal : dayTotal.toFixed(1)}h</span>
+    </div>`;
+    entries.forEach((e, i) => {
+      const emp = EMPLOYEES.find(x => x.key === e.employee);
+      const job = jobs.find(j => j.id === e.jobId);
+      html += `<div class="time-entry-card" style="animation-delay:${i*30}ms">
+        <button class="te-delete" onclick="deleteTimeEntry(${e.id})">✕</button>
+        <div class="te-header">
+          <div class="te-avatar" style="background:${emp ? emp.color + '22' : 'var(--surface2)'};color:${emp ? emp.color : 'var(--text-muted)'}">
+            ${emp ? emp.initials : '?'}
+          </div>
+          <div class="te-info">
+            <div class="te-name">${e.employee}</div>
+            <div class="te-meta">${e.date}</div>
+          </div>
+          <div class="te-hours-badge" style="color:${emp ? emp.color : 'var(--accent)'}">${e.hours % 1 === 0 ? e.hours : e.hours.toFixed(1)}h</div>
+        </div>
+        ${e.description ? `<div class="te-desc">${escapeHTML(e.description)}</div>` : ''}
+        ${job ? `<div class="te-job-tag">#${job.jobNumber} — ${job.customer}</div>` : ''}
+      </div>`;
+    });
+  });
+  el.innerHTML = html;
+}
+
+function populateTimeJobSelect() {
+  const sel = document.getElementById('t-job');
+  if (!sel) return;
+  const activeJobs = jobs.filter(j => j.status !== 'completed').sort((a,b) => a.priority - b.priority);
+  sel.innerHTML = `<option value="">— General / No specific job —</option>` +
+    activeJobs.map(j => `<option value="${j.id}">#${j.jobNumber} — ${j.customer}</option>`).join('');
+}
+
+function openTimeSheet() {
+  document.getElementById('t-date').value = new Date().toISOString().split('T')[0];
+  if (currentUser) document.getElementById('t-emp').value = currentUser.name;
+  document.getElementById('t-hours').value = '';
+  document.getElementById('t-desc').value = '';
+  populateTimeJobSelect();
+  document.getElementById('time-sheet').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeTimeSheet() {
+  document.getElementById('time-sheet').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function saveTimeEntry() {
+  const employee = document.getElementById('t-emp').value;
+  const date = document.getElementById('t-date').value;
+  const hours = parseFloat(document.getElementById('t-hours').value);
+  const description = document.getElementById('t-desc').value.trim();
+  const jobIdVal = document.getElementById('t-job').value;
+  const jobId = jobIdVal ? parseInt(jobIdVal) : null;
+
+  if (!employee || !date || isNaN(hours) || hours <= 0) {
+    showToast('Please fill Employee, Date & Hours', true);
+    return;
+  }
+
+  timeEntries.push({ id: timeNextId++, employee, date, hours, description, jobId });
+  saveData();
+  closeTimeSheet();
+  renderTimeScreen();
+  showToast('Hours logged ✓');
+}
+
+function deleteTimeEntry(id) {
+  if (!confirm('Delete this time entry?')) return;
+  timeEntries = timeEntries.filter(e => e.id !== id);
+  saveData();
+  renderTimeScreen();
+  showToast('Entry deleted');
+}
+
+// ========== UTILS ==========
+function updateBadge() {
+  const active = jobs.filter(j => j.status !== 'completed').length;
+  const badge = document.getElementById('active-badge');
+  badge.textContent = active;
+  badge.style.display = active > 0 ? 'flex' : 'none';
+}
+
+let toastTimer;
+function showToast(msg, error = false) {
+  let t = document.getElementById('toast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'toast';
+    t.style.cssText = `position:fixed;bottom:calc(var(--nav-h) + var(--safe-bottom) + 20px);left:50%;transform:translateX(-50%);background:var(--green);color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;letter-spacing:1px;padding:10px 20px;border-radius:20px;z-index:300;transition:opacity 0.3s;pointer-events:none;white-space:nowrap;`;
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.style.background = error ? 'var(--red)' : 'var(--green)';
+  t.style.opacity = '1';
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.style.opacity = '0', 2200);
+}
+
+// ========== ADD TO HOME SCREEN PROMPT ==========
+function initA2HS() {
+  // Only show on iOS Safari (not Android, not already installed as PWA)
+  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  const isInStandaloneMode = ('standalone' in window.navigator) && window.navigator.standalone;
+  const dismissed = localStorage.getItem('pumptrack_a2hs_dismissed');
+  if (isIOS && !isInStandaloneMode && !dismissed) {
+    // Show after a short delay so it doesn't appear instantly on login
+    setTimeout(() => {
+      document.getElementById('a2hs-banner').classList.add('show');
+    }, 3000);
+  }
+}
+
+function dismissA2HS() {
+  document.getElementById('a2hs-banner').classList.remove('show');
+  try { localStorage.setItem('pumptrack_a2hs_dismissed', '1'); } catch(e) {}
+}
+
+// ========== KEYBOARD NOTE ==========
+document.getElementById('note-input')?.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && e.metaKey) postNote();
+});
+
+// ========== INIT ==========
+// Load data first (always, regardless of user)
+loadData();
+// Restore saved user or show login screen
+try {
+  const saved = localStorage.getItem('pumptrack_user');
+  if (saved) {
+    const u = JSON.parse(saved);
+    loginAs(u.name, u.initials, u.color);
+  }
+  // else login screen stays visible (default)
+} catch(e) {
+  // login screen stays visible
+}
+buildFilterChips();
+</script>
+
+
+</body></html>
