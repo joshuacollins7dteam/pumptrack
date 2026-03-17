@@ -357,7 +357,12 @@ body::before{content:'';position:fixed;top:0;left:0;right:0;height:var(--safe-to
           <div class="stat-card sc-pending"><div class="stat-num" id="st-parts">0</div><div class="stat-lbl">Waiting Parts</div></div>
         </div>
       </div>
-      <div class="section-head">Priority Job Board <button class="section-head-link" onclick="showScreen('jobs')">View All →</button></div>
+      <div class="section-head">Priority Job Board
+        <div style="display:flex;align-items:center;gap:8px">
+          <button onclick="refreshJobs()" style="background:var(--accent-dim);border:1px solid rgba(58,181,212,0.3);color:var(--accent);font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:4px 10px;border-radius:4px;">🔄 Refresh</button>
+          <button class="section-head-link" onclick="showScreen('jobs')">View All →</button>
+        </div>
+      </div>
       <div class="priority-queue" id="home-queue"></div>
       <div style="height:16px"></div>
     </div>
@@ -508,7 +513,56 @@ body::before{content:'';position:fixed;top:0;left:0;right:0;height:var(--safe-to
 </div>
 
 <script>
-const EMPLOYEES={
+// ═══════════════════════════════════════════
+// CLOUD SYNC — pull jobs from manager
+// ═══════════════════════════════════════════
+const hasCloud = typeof window !== 'undefined' && typeof window.storage !== 'undefined';
+
+async function pullJobsFromCloud(){
+  if(!hasCloud) return false;
+  try{
+    const result=await window.storage.get('shared_jobs',true);
+    if(result&&result.value){
+      const data=JSON.parse(result.value);
+      if(Array.isArray(data.jobs)&&data.jobs.length>0){
+        data.jobs.forEach(cj=>{
+          const local=jobs.find(j=>j.id===cj.id);
+          if(local){
+            const ph=local.photos||[];
+            const nl=local.notesLog||[];
+            Object.assign(local,cj);
+            local.photos=ph;
+            local.notesLog=nl;
+          } else {
+            jobs.push({...cj,photos:[],notesLog:[]});
+          }
+        });
+        jobs=jobs.filter(j=>data.jobs.find(cj=>cj.id===j.id));
+        nextId=Math.max(nextId,data.jobNextId||8);
+        saveData();
+        return true;
+      }
+    }
+  }catch(e){ console.warn('Cloud pull failed:',e); }
+  return false;
+}
+
+function showSyncBanner(msg,ok=true){
+  let b=document.getElementById('sync-banner');
+  if(!b){
+    b=document.createElement('div');
+    b.id='sync-banner';
+    b.style.cssText=`position:fixed;top:calc(var(--header-h) + var(--safe-top) + 8px);left:50%;transform:translateX(-50%);color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:1px;padding:6px 16px;border-radius:20px;z-index:400;transition:opacity 0.4s;white-space:nowrap;pointer-events:none;`;
+    document.body.appendChild(b);
+  }
+  b.textContent=msg;
+  b.style.background=ok?'rgba(16,185,129,0.95)':'rgba(249,115,22,0.95)';
+  b.style.opacity='1';
+  clearTimeout(b._t);
+  b._t=setTimeout(()=>b.style.opacity='0',2500);
+}
+
+
   'Geoff Wright':  {initials:'GW',color:'#3ab5d4',role:'Workshop Technician',key:'geoff'},
   'Julian Banovich':{initials:'JB',color:'#5e9fd4',role:'Workshop Technician',key:'julian'},
   'Ciaran Doherty':{initials:'CD',color:'#7bc4d4',role:'Quality Control / Stores',key:'ciaran'},
@@ -527,7 +581,14 @@ function login(name,initials,color){
   try{localStorage.setItem('pt_emp',JSON.stringify(emp));}catch(e){}
   document.getElementById('login-screen').style.display='none';
   document.getElementById('app').style.display='flex';
-  loadData();renderHome();updateBadge();buildFilterChips();
+  loadData();
+  // pull latest jobs from manager cloud
+  showSyncBanner('Checking for job updates…', true);
+  pullJobsFromCloud().then(updated=>{
+    if(updated) showSyncBanner('✓ Jobs updated from manager',true);
+    renderHome();updateBadge();buildFilterChips();
+  });
+  renderHome();updateBadge();buildFilterChips();
 }
 function logout(){
   try{localStorage.removeItem('pt_emp');}catch(e){}
@@ -569,7 +630,19 @@ let nextId=8,timeEntries=[],timeNextId=1,currentJobId=null,currentScreen='home',
 const STATUS={completed:{label:'Completed',cls:'sp-completed'},progress:{label:'In Progress',cls:'sp-progress'},pending:{label:'Pending',cls:'sp-pending'},quote:{label:'Quote',cls:'sp-quote'},parts:{label:'Waiting for Parts',cls:'sp-parts'}};
 const PRIO={1:{label:'P1 CRITICAL',cls:'pp-1',color:'var(--p1)'},2:{label:'P2 HIGH',cls:'pp-2',color:'var(--p2)'},3:{label:'P3 MEDIUM',cls:'pp-3',color:'var(--p3)'},4:{label:'P4 LOW',cls:'pp-4',color:'var(--p4)'},5:{label:'P5 BACKLOG',cls:'pp-5',color:'var(--p5)'}};
 
-function showScreen(name){
+function refreshJobs(){
+  showSyncBanner('Checking for updates…',true);
+  pullJobsFromCloud().then(updated=>{
+    if(updated){
+      showSyncBanner('✓ Jobs updated from manager',true);
+      renderHome();renderJobsList();updateBadge();
+    } else {
+      showSyncBanner('Already up to date',true);
+    }
+  });
+}
+
+
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   document.getElementById(`screen-${name}`).classList.add('active');
