@@ -513,9 +513,9 @@ body::before{content:'';position:fixed;top:0;left:0;right:0;height:var(--safe-to
 </div>
 
 <script>
-// ═══════════════════════════════════════════
-// CLOUD SYNC — pull jobs from manager
-// ═══════════════════════════════════════════
+// ===========================================
+// CLOUD SYNC - pull jobs from manager
+// ===========================================
 const hasCloud = typeof window !== 'undefined' && typeof window.storage !== 'undefined';
 
 async function pullJobsFromCloud(){
@@ -583,9 +583,9 @@ function login(name,initials,color){
   document.getElementById('app').style.display='flex';
   loadData();
   // pull latest jobs from manager cloud
-  showSyncBanner('Checking for job updates…', true);
+  showSyncBanner('Checking for job updates...', true);
   pullJobsFromCloud().then(updated=>{
-    if(updated) showSyncBanner('✓ Jobs updated from manager',true);
+    if(updated) showSyncBanner('done Jobs updated from manager',true);
     renderHome();updateBadge();buildFilterChips();
   });
   renderHome();updateBadge();buildFilterChips();
@@ -631,10 +631,10 @@ const STATUS={completed:{label:'Completed',cls:'sp-completed'},progress:{label:'
 const PRIO={1:{label:'P1 CRITICAL',cls:'pp-1',color:'var(--p1)'},2:{label:'P2 HIGH',cls:'pp-2',color:'var(--p2)'},3:{label:'P3 MEDIUM',cls:'pp-3',color:'var(--p3)'},4:{label:'P4 LOW',cls:'pp-4',color:'var(--p4)'},5:{label:'P5 BACKLOG',cls:'pp-5',color:'var(--p5)'}};
 
 function refreshJobs(){
-  showSyncBanner('Checking for updates…',true);
+  showSyncBanner('Checking for updates...',true);
   pullJobsFromCloud().then(updated=>{
     if(updated){
-      showSyncBanner('✓ Jobs updated from manager',true);
+      showSyncBanner('done Jobs updated from manager',true);
       renderHome();renderJobsList();updateBadge();
     } else {
       showSyncBanner('Already up to date',true);
@@ -667,7 +667,7 @@ function renderHome(){
   const hrsToday=timeEntries.filter(e=>e.date===todayStr&&e.employee===emp.name).reduce((s,e)=>s+e.hours,0);
   document.getElementById('st-hours').textContent=fmt(hrsToday);
   const queue=[...jobs].filter(j=>j.status!=='completed').sort((a,b)=>a.priority-b.priority).slice(0,6);
-  document.getElementById('home-queue').innerHTML=queue.length?queue.map((j,i)=>jobCardHTML(j,i)).join(''):`<div class="empty-list"><div class="empty-icon">🎉</div><p>No active jobs!</p></div>`;
+  document.getElementById('home-queue').innerHTML=queue.length?queue.map((j,i)=>jobCardHTML(j,i)).join(''):`<div class="empty-list"><div class="empty-icon"></div><p>No active jobs!</p></div>`;
 }
 
 function buildFilterChips(){
@@ -683,7 +683,7 @@ function renderJobsList(){
     if(activeFilter&&j.status!==activeFilter)return false;
     return true;
   }).sort((a,b)=>a.priority-b.priority||b.jobNumber-a.jobNumber);
-  document.getElementById('jobs-list').innerHTML=filtered.length?filtered.map((j,i)=>jobCardHTML(j,i)).join(''):`<div class="empty-list"><div class="empty-icon">🔍</div><p>No jobs found.</p></div>`;
+  document.getElementById('jobs-list').innerHTML=filtered.length?filtered.map((j,i)=>jobCardHTML(j,i)).join(''):`<div class="empty-list"><div class="empty-icon"></div><p>No jobs found.</p></div>`;
 }
 
 function jobCardHTML(j,i){
@@ -698,9 +698,9 @@ function jobCardHTML(j,i){
         <div class="job-pump">${j.pumpType}</div>
         <div class="job-card-footer">
           <span class="status-pill ${s.cls}">${s.label}</span>
-          ${jobHrs>0?`<span class="job-hours-tag">⏱ ${fmt(jobHrs)}h logged</span>`:''}
-          ${j.photos?.length?`<span class="count-tag">📷 ${j.photos.length}</span>`:''}
-          ${j.notesLog?.length?`<span class="count-tag">💬 ${j.notesLog.length}</span>`:''}
+          ${jobHrs>0?`<span class="job-hours-tag"> ${fmt(jobHrs)}h logged</span>`:''}
+          ${j.photos?.length?`<span class="count-tag"> ${j.photos.length}</span>`:''}
+          ${j.notesLog?.length?`<span class="count-tag"> ${j.notesLog.length}</span>`:''}
         </div>
       </div>
     </div>
@@ -717,10 +717,10 @@ function openJob(id){
   const s=STATUS[j.status]||STATUS.progress,p=PRIO[j.priority];
   document.getElementById('d-badges').innerHTML=`<span class="status-pill ${s.cls}">${s.label}</span><span class="priority-pill ${p.cls}">${p.label}</span>`;
   document.getElementById('di-jobnum').textContent=j.jobNumber;
-  document.getElementById('di-date').textContent=j.dateReceived||'—';
+  document.getElementById('di-date').textContent=j.dateReceived||'-';
   document.getElementById('di-customer').textContent=j.customer;
   document.getElementById('di-pump').textContent=j.pumpType;
-  document.getElementById('di-progress').textContent=j.progress||'—';
+  document.getElementById('di-progress').textContent=j.progress||'-';
   document.getElementById('di-status').innerHTML=`<span class="status-pill ${s.cls}">${s.label}</span>`;
   switchTab('info');renderPhotos();renderNotes();renderJobHours();
 }
@@ -740,7 +740,7 @@ function renderJobHours(){
     const initials=EMPLOYEES[e.employee]?.initials||'??';
     return `<div class="job-hour-entry">
       <div class="jhe-avatar" style="background:${color}33;color:${color}">${initials}</div>
-      <div style="flex:1;min-width:0"><div class="jhe-name">${e.employee}</div><div class="jhe-meta">${e.date}${e.description?' · '+e.description.slice(0,40):''}</div></div>
+      <div style="flex:1;min-width:0"><div class="jhe-name">${e.employee}</div><div class="jhe-meta">${e.date}${e.description?' ? '+e.description.slice(0,40):''}</div></div>
       <div class="jhe-hours" style="color:${color}">${fmt(e.hours)}h</div>
     </div>`;
   }).join(''):`<div style="text-align:center;padding:24px;color:var(--text-dim);font-size:13px">No hours logged on this job yet.</div>`;
@@ -754,7 +754,7 @@ function handlePhotoUpload(e){
 }
 function renderPhotos(){
   const j=jobs.find(x=>x.id===currentJobId);
-  document.getElementById('photo-grid').innerHTML=j&&j.photos.length?j.photos.map(ph=>`<div class="photo-thumb" onclick="openLightbox('${ph.src}')"><img src="${ph.src}" alt=""><div class="photo-thumb-overlay"><button class="photo-del-btn" onclick="event.stopPropagation();deletePhoto('${ph.id}')">✕</button></div></div>`).join(''):`<div class="no-photos" style="grid-column:1/-1">📷 No photos yet.</div>`;
+  document.getElementById('photo-grid').innerHTML=j&&j.photos.length?j.photos.map(ph=>`<div class="photo-thumb" onclick="openLightbox('${ph.src}')"><img src="${ph.src}" alt=""><div class="photo-thumb-overlay"><button class="photo-del-btn" onclick="event.stopPropagation();deletePhoto('${ph.id}')">x</button></div></div>`).join(''):`<div class="no-photos" style="grid-column:1/-1"> No photos yet.</div>`;
 }
 function deletePhoto(pid){const j=jobs.find(x=>x.id===currentJobId);if(!j)return;j.photos=j.photos.filter(p=>p.id!=pid);renderPhotos();saveData();}
 function openLightbox(src){document.getElementById('lightbox-img').src=src;document.getElementById('lightbox').classList.add('open');}
@@ -764,14 +764,14 @@ function postNote(){
   const input=document.getElementById('note-input'),text=input.value.trim();if(!text)return;
   const j=jobs.find(x=>x.id===currentJobId);if(!j)return;
   j.notesLog.unshift({text,time:Date.now(),author:emp.name.split(' ')[0]});
-  input.value='';renderNotes();saveData();showToast('Note added ✓');
+  input.value='';renderNotes();saveData();showToast('Note added done');
 }
 function renderNotes(){
   const j=jobs.find(x=>x.id===currentJobId);
   document.getElementById('notes-log').innerHTML=j&&j.notesLog.length?j.notesLog.map(n=>{
     const d=new Date(n.time);
-    return `<div class="note-entry"><div class="note-meta"><span class="note-author">${n.author}</span> · ${d.toLocaleString('en-AU',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}</div><div class="note-body">${esc(n.text)}</div></div>`;
-  }).join(''):`<div class="no-notes">💬 No notes yet.</div>`;
+    return `<div class="note-entry"><div class="note-meta"><span class="note-author">${n.author}</span> ? ${d.toLocaleString('en-AU',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}</div><div class="note-body">${esc(n.text)}</div></div>`;
+  }).join(''):`<div class="no-notes"> No notes yet.</div>`;
 }
 
 function getWeekStart(date){const d=new Date(date),day=d.getDay(),diff=d.getDate()-day+(day===0?-6:1);return new Date(new Date(d).setDate(diff)).toISOString().split('T')[0];}
@@ -792,10 +792,10 @@ function renderTimeScreen(){
     </div>`;
   const days=[];for(let i=6;i>=0;i--){const d=new Date(now);d.setDate(d.getDate()-i);const str=d.toISOString().split('T')[0];days.push({str,lbl:d.toLocaleDateString('en-AU',{weekday:'short'}).slice(0,2),hrs:my.filter(e=>e.date===str).reduce((s,e)=>s+e.hours,0)});}
   const maxH=Math.max(...days.map(d=>d.hrs),8);
-  document.getElementById('time-weekly-wrap').innerHTML=`<div class="weekly-chart"><div class="weekly-chart-title">My Hours — Last 7 Days</div><div class="weekly-bars">${days.map(d=>{const pct=maxH>0?(d.hrs/maxH)*54:0;const isToday=d.str===todayStr;return `<div class="weekly-bar-wrap"><div class="weekly-bar-val">${d.hrs>0?fmt(d.hrs):''}</div><div class="weekly-bar" style="height:${Math.max(pct,d.hrs>0?4:2)}px;background:${isToday?emp.color:'var(--text-muted)'};opacity:${isToday?1:0.5}"></div><div class="weekly-bar-lbl" style="color:${isToday?emp.color:'var(--text-dim)'}">${d.lbl}</div></div>`;}).join('')}</div></div>`;
+  document.getElementById('time-weekly-wrap').innerHTML=`<div class="weekly-chart"><div class="weekly-chart-title">My Hours - Last 7 Days</div><div class="weekly-bars">${days.map(d=>{const pct=maxH>0?(d.hrs/maxH)*54:0;const isToday=d.str===todayStr;return `<div class="weekly-bar-wrap"><div class="weekly-bar-val">${d.hrs>0?fmt(d.hrs):''}</div><div class="weekly-bar" style="height:${Math.max(pct,d.hrs>0?4:2)}px;background:${isToday?emp.color:'var(--text-muted)'};opacity:${isToday?1:0.5}"></div><div class="weekly-bar-lbl" style="color:${isToday?emp.color:'var(--text-dim)'}">${d.lbl}</div></div>`;}).join('')}</div></div>`;
   const sorted=[...my].sort((a,b)=>b.date.localeCompare(a.date)||b.id-a.id);
   const el=document.getElementById('time-entries-list');
-  if(!sorted.length){el.innerHTML=`<div class="empty-list"><div class="empty-icon">⏱</div><p>No entries yet.<br>Tap "+ Log" to add hours.</p></div>`;return;}
+  if(!sorted.length){el.innerHTML=`<div class="empty-list"><div class="empty-icon"></div><p>No entries yet.<br>Tap "+ Log" to add hours.</p></div>`;return;}
   const grouped={};sorted.forEach(e=>{if(!grouped[e.date])grouped[e.date]=[];grouped[e.date].push(e);});
   const total=sorted.reduce((s,e)=>s+e.hours,0);
   let html=`<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 2px 10px"><span style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;color:var(--text-muted);text-transform:uppercase">${sorted.length} entries</span><span style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:800;color:${emp.color}">${fmt(total)} hrs total</span></div>`;
@@ -803,10 +803,10 @@ function renderTimeScreen(){
     const d=new Date(date+'T12:00:00'),dayTotal=entries.reduce((s,e)=>s+e.hours,0);
     html+=`<div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-muted);padding:8px 2px 4px;display:flex;justify-content:space-between"><span>${d.toLocaleDateString('en-AU',{weekday:'long',day:'numeric',month:'short'})}</span><span style="color:${emp.color}">${fmt(dayTotal)}h</span></div>`;
     entries.forEach((e,i)=>{const job=jobs.find(j=>j.id===e.jobId);html+=`<div class="time-entry-card" style="animation-delay:${i*30}ms">
-      <button class="te-delete" onclick="deleteTimeEntry(${e.id})">✕</button>
+      <button class="te-delete" onclick="deleteTimeEntry(${e.id})">x</button>
       <div class="te-header"><div class="te-info"><div class="te-date">${e.date}</div><div class="te-meta">${e.employee}</div></div><div class="te-hours-badge" style="color:${emp.color}">${fmt(e.hours)}h</div></div>
       ${e.description?`<div class="te-desc">${esc(e.description)}</div>`:''}
-      ${job?`<div class="te-job-tag">#${job.jobNumber} — ${job.customer}</div>`:''}
+      ${job?`<div class="te-job-tag">#${job.jobNumber} - ${job.customer}</div>`:''}
     </div>`;});
   });
   el.innerHTML=html;
@@ -815,7 +815,7 @@ function openTimeSheet(presetJobId=null){
   document.getElementById('t-date').value=new Date().toISOString().split('T')[0];
   document.getElementById('t-hours').value='';document.getElementById('t-desc').value='';
   const sel=document.getElementById('t-job');
-  sel.innerHTML=`<option value="">— Select a job —</option>`+jobs.sort((a,b)=>a.priority-b.priority).map(j=>`<option value="${j.id}">#${j.jobNumber} — ${j.customer} (${STATUS[j.status]?.label||j.status})</option>`).join('');
+  sel.innerHTML=`<option value="">- Select a job -</option>`+jobs.sort((a,b)=>a.priority-b.priority).map(j=>`<option value="${j.id}">#${j.jobNumber} - ${j.customer} (${STATUS[j.status]?.label||j.status})</option>`).join('');
   if(presetJobId)sel.value=String(presetJobId);
   document.getElementById('time-sheet').classList.add('open');
 }
@@ -829,7 +829,7 @@ function saveTimeEntry(){
   saveData();closeTimeSheet();
   if(currentScreen==='time')renderTimeScreen();
   if(currentScreen==='detail')renderJobHours();
-  renderHome();updateBadge();showToast('Hours logged ✓');
+  renderHome();updateBadge();showToast('Hours logged done');
 }
 function deleteTimeEntry(id){if(!confirm('Delete this time entry?'))return;timeEntries=timeEntries.filter(e=>e.id!==id);saveData();renderTimeScreen();showToast('Entry deleted');}
 
@@ -854,7 +854,7 @@ function generateQR(){
   document.getElementById('qr-summary').innerHTML=`
     ${Object.values(byJob).map(v=>`<div class="qr-summary-row"><span class="qr-summary-label">#${v.job?.jobNumber||'?'} ${v.job?.customer||''}</span><span class="qr-summary-val">${fmt(v.hrs)}h</span></div>`).join('')||'<div class="qr-summary-row"><span class="qr-summary-label">No entries for this period</span><span></span></div>'}
     <div class="qr-summary-row"><span class="qr-summary-label" style="font-weight:700;color:var(--text)">Total Hours</span><span class="qr-summary-total">${fmt(totalHrs)}h</span></div>`;
-  document.getElementById('qr-entries-preview').innerHTML=`<div class="qr-entries-head">Entries (${entries.length})</div>${entries.slice(0,8).map(e=>{const j=jobs.find(x=>x.id===e.jobId);return `<div class="qr-entry-row"><div><div class="qr-entry-info">${e.date} · ${fmt(e.hours)}h</div><div class="qr-entry-job">#${j?.jobNumber||'?'} ${j?.customer||''}</div></div><span class="qr-entry-hrs">${fmt(e.hours)}h</span></div>`;}).join('')}${entries.length>8?`<div style="padding:10px 14px;font-size:11px;color:var(--text-muted)">…and ${entries.length-8} more</div>`:''}`;
+  document.getElementById('qr-entries-preview').innerHTML=`<div class="qr-entries-head">Entries (${entries.length})</div>${entries.slice(0,8).map(e=>{const j=jobs.find(x=>x.id===e.jobId);return `<div class="qr-entry-row"><div><div class="qr-entry-info">${e.date} ? ${fmt(e.hours)}h</div><div class="qr-entry-job">#${j?.jobNumber||'?'} ${j?.customer||''}</div></div><span class="qr-entry-hrs">${fmt(e.hours)}h</span></div>`;}).join('')}${entries.length>8?`<div style="padding:10px 14px;font-size:11px;color:var(--text-muted)">...and ${entries.length-8} more</div>`:''}`;
   const payload={type:'pumptrack_hours_v2',exported:new Date().toISOString(),employee:emp.name,initials:emp.initials,period:qrDateRange,totalHours:totalHrs,entries:entries.map(e=>({id:e.id,date:e.date,hours:e.hours,jobId:e.jobId,jobNumber:jobs.find(j=>j.id===e.jobId)?.jobNumber,customer:jobs.find(j=>j.id===e.jobId)?.customer,description:e.description||''}))};
   const container=document.getElementById('qr-canvas');
   container.innerHTML='';
