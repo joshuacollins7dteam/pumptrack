@@ -552,7 +552,7 @@ function showSyncBanner(msg,ok=true){
   if(!b){
     b=document.createElement('div');
     b.id='sync-banner';
-    b.style.cssText=`position:fixed;top:calc(var(--header-h) + var(--safe-top) + 8px);left:50%;transform:translateX(-50%);color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:1px;padding:6px 16px;border-radius:20px;z-index:400;transition:opacity 0.4s;white-space:nowrap;pointer-events:none;`;
+    b.style.cssText='position:fixed;top:calc(var(--header-h) + var(--safe-top) + 8px);left:50%;transform:translateX(-50%);color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:1px;padding:6px 16px;border-radius:20px;z-index:400;transition:opacity 0.4s;white-space:nowrap;pointer-events:none;';
     document.body.appendChild(b);
   }
   b.textContent=msg;
@@ -573,7 +573,7 @@ function login(name,initials,color){
   emp={name,initials,color};
   document.documentElement.style.setProperty('--emp-color',color);
   const dot=document.getElementById('topbar-dot');
-  dot.textContent=initials;dot.style.cssText=`background:${color}33;color:${color};width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:800;`;
+  dot.textContent=initials;dot.style.cssText='background:'+color+'33;color:'+color+';width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:800;';
   document.getElementById('topbar-name').textContent=name.split(' ')[0];
   const av=document.getElementById('emp-hero-avatar');
   av.textContent=initials;av.style.background=color+'33';av.style.color=color;
@@ -871,7 +871,7 @@ function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').repl
 let toastTimer;
 function showToast(msg,error=false){
   let t=document.getElementById('toast');
-  if(!t){t=document.createElement('div');t.id='toast';t.style.cssText=`position:fixed;bottom:calc(var(--nav-h)+var(--safe-bottom)+20px);left:50%;transform:translateX(-50%);color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;letter-spacing:1px;padding:10px 20px;border-radius:20px;z-index:300;transition:opacity 0.3s;pointer-events:none;white-space:nowrap`;document.body.appendChild(t);}
+  if(!t){t=document.createElement('div');t.id='toast';t.style.cssText='position:fixed;bottom:calc(var(--nav-h)+var(--safe-bottom)+20px);left:50%;transform:translateX(-50%);color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;letter-spacing:1px;padding:10px 20px;border-radius:20px;z-index:300;transition:opacity 0.3s;pointer-events:none;white-space:nowrap';document.body.appendChild(t);}
   t.textContent=msg;t.style.background=error?'var(--red)':'var(--green)';t.style.opacity='1';
   clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.style.opacity='0',2200);
 }
