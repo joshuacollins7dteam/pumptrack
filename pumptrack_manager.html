@@ -203,6 +203,7 @@ tr:hover td{background:rgba(255,255,255,0.015);}
   <div class="mgr-badge">Manager</div>
   <div class="topbar-right">
     <span class="last-sync" id="last-sync-label"></span>
+    <button class="tb-btn secondary" onclick="syncNow()" title="Push jobs to employee app">🔄 Sync</button>
     <button class="tb-btn secondary" onclick="openAddHoursModal()">+ Log Hours</button>
     <button class="tb-btn secondary" onclick="openJobModal()">+ New Job</button>
     <button class="tb-btn primary" onclick="openScanModal()">📷 Import QR</button>
@@ -549,9 +550,11 @@ let detailJobId   = null;
 let parsedImport  = null;
 
 // ═══════════════════════════════════════════
-// STORAGE
+// STORAGE — local + shared cloud sync
 // ═══════════════════════════════════════════
-function save(){
+const hasCloud = typeof window !== 'undefined' && typeof window.storage !== 'undefined';
+
+async function save(){
   try{
     const jobsSave=jobs.map(j=>({...j,photos:[]}));
     localStorage.setItem('pt_mgr_jobs',JSON.stringify(jobsSave));
@@ -562,27 +565,69 @@ function save(){
     });
     localStorage.setItem('pt_mgr_entries',JSON.stringify(timeEntries));
     localStorage.setItem('pt_mgr_entryNextId',String(entryNextId));
+    if(hasCloud) await pushJobsToCloud();
   }catch(e){console.warn(e);}
 }
-function load(){
+
+async function pushJobsToCloud(){
+  if(!hasCloud){ setSyncStatus('Offline mode — no cloud sync',true); return; }
+  try{
+    const payload=JSON.stringify({
+      jobs:jobs.map(j=>({...j,photos:[]})),
+      jobNextId,
+      updatedAt:Date.now()
+    });
+    await window.storage.set('shared_jobs',payload,true);
+    setSyncStatus('✓ Jobs synced to employees',false);
+  }catch(e){
+    setSyncStatus('⚠ Cloud sync failed — data saved locally',true);
+    console.warn('Cloud push failed:',e);
+  }
+}
+
+async function pullJobsFromCloud(){
+  if(!hasCloud) return false;
+  try{
+    const result=await window.storage.get('shared_jobs',true);
+    if(result&&result.value){
+      const data=JSON.parse(result.value);
+      if(Array.isArray(data.jobs)&&data.jobs.length>0){
+        data.jobs.forEach(cj=>{
+          const local=jobs.find(j=>j.id===cj.id);
+          if(local){
+            const ph=local.photos||[];
+            const nl=local.notesLog||[];
+            Object.assign(local,cj);
+            local.photos=ph;
+            local.notesLog=nl;
+          } else {
+            jobs.push({...cj,photos:[],notesLog:[]});
+          }
+        });
+        jobs=jobs.filter(j=>data.jobs.find(cj=>cj.id===j.id));
+        jobNextId=Math.max(jobNextId,data.jobNextId||8);
+        return true;
+      }
+    }
+  }catch(e){ console.warn('Cloud pull failed:',e); }
+  return false;
+}
+
+function setSyncStatus(msg,isError){
+  const el=document.getElementById('last-sync-label');
+  if(el){ el.textContent=msg; el.style.color=isError?'var(--orange)':'var(--green)'; }
+}
+
+async function load(){
   try{
     const sj=localStorage.getItem('pt_mgr_jobs');
     if(sj){
       const parsed=JSON.parse(sj);
-      if(Array.isArray(parsed) && parsed.length>0){
+      if(Array.isArray(parsed)&&parsed.length>0){
         jobs=parsed;
-        // merge in any default jobs that are missing (by id)
-        DEFAULT_JOBS.forEach(dj=>{
-          if(!jobs.find(j=>j.id===dj.id)){
-            jobs.push({...dj,photos:[],notesLog:[]});
-          }
-        });
-        jobs.forEach(j=>{
-          const ph=localStorage.getItem(`pt_mgr_ph_${j.id}`);
-          j.photos=ph?JSON.parse(ph):[];
-          if(!j.notesLog)j.notesLog=[];
-        });
-        jobNextId=Math.max(parseInt(localStorage.getItem('pt_mgr_jobNextId')||'8'), jobs.reduce((m,j)=>Math.max(m,j.id+1),8));
+        DEFAULT_JOBS.forEach(dj=>{ if(!jobs.find(j=>j.id===dj.id)) jobs.push({...dj,photos:[],notesLog:[]}); });
+        jobs.forEach(j=>{ const ph=localStorage.getItem(`pt_mgr_ph_${j.id}`); j.photos=ph?JSON.parse(ph):[]; if(!j.notesLog)j.notesLog=[]; });
+        jobNextId=Math.max(parseInt(localStorage.getItem('pt_mgr_jobNextId')||'8'),jobs.reduce((m,j)=>Math.max(m,j.id+1),8));
       } else {
         jobs=DEFAULT_JOBS.map(j=>({...j,photos:[],notesLog:[]}));
       }
@@ -590,7 +635,14 @@ function load(){
     const se=localStorage.getItem('pt_mgr_entries');
     if(se){timeEntries=JSON.parse(se);entryNextId=parseInt(localStorage.getItem('pt_mgr_entryNextId')||'1');}
     const ls=localStorage.getItem('pt_mgr_lastSync');
-    if(ls)document.getElementById('last-sync-label').textContent='Last import: '+ls;
+    if(ls) setSyncStatus('Last import: '+ls,false);
+    if(hasCloud){
+      setSyncStatus('Syncing…',false);
+      await pullJobsFromCloud();
+      setSyncStatus(hasCloud?'✓ Live':'Offline mode',false);
+    } else {
+      setSyncStatus('Running locally — no cloud sync',true);
+    }
   }catch(e){
     console.warn('Load error:',e);
     jobs=DEFAULT_JOBS.map(j=>({...j,photos:[],notesLog:[]}));
@@ -861,7 +913,7 @@ function openJobModal(jobId=null){
   document.getElementById('job-modal').classList.add('open');
 }
 function closeJobModal(){ document.getElementById('job-modal').classList.remove('open'); }
-function saveJob(){
+async function saveJob(){
   const num=parseInt(document.getElementById('jm-num').value);
   const customer=document.getElementById('jm-customer').value.trim().toUpperCase();
   const pump=document.getElementById('jm-pump').value.trim().toUpperCase();
@@ -885,16 +937,16 @@ function saveJob(){
     if(qh>0) quotedHours[newJob.id]=qh;
   }
   try{ localStorage.setItem('pt_mgr_quoted',JSON.stringify(quotedHours)); }catch(e){}
-  save();closeJobModal();
+  await save();closeJobModal();
   if(currentView==='jobs')renderJobsView();
   else if(currentView==='dashboard')renderDashboard();
   showToast(editingJobId?'Job updated ✓':'Job created ✓');
 }
-function deleteJob(jobId){
+async function deleteJob(jobId){
   if(!confirm('Delete this job? This will also delete all associated time entries.'))return;
   jobs=jobs.filter(j=>j.id!==jobId);
   timeEntries=timeEntries.filter(e=>e.jobId!==jobId);
-  save();renderJobsView();showToast('Job deleted');
+  await save();renderJobsView();showToast('Job deleted');
 }
 
 // ═══════════════════════════════════════════
@@ -979,7 +1031,7 @@ function openAddHoursModal(presetJobId=null, presetEmp=null){
   document.getElementById('add-hours-modal').classList.add('open');
 }
 function closeAddHoursModal(){ document.getElementById('add-hours-modal').classList.remove('open'); }
-function saveHoursEntry(){
+async function saveHoursEntry(){
   const empName=document.getElementById('ah-emp').value;
   const date=document.getElementById('ah-date').value;
   const jobId=parseInt(document.getElementById('ah-job').value);
@@ -989,16 +1041,22 @@ function saveHoursEntry(){
   const emp=EMPLOYEES[empName]||{initials:'?',color:'#888'};
   const job=jobs.find(j=>j.id===jobId);
   timeEntries.push({id:entryNextId++,employee:empName,initials:emp.initials,color:emp.color,date,hours,jobId,jobNumber:job?.jobNumber,customer:job?.customer,description:desc});
-  save();closeAddHoursModal();
+  await save();closeAddHoursModal();
   refreshCurrentView();
   showToast(`${fmt(hours)}h logged for ${empName.split(' ')[0]} ✓`);
 }
-function deleteEntry(id){
+async function deleteEntry(id){
   if(!confirm('Delete this time entry?'))return;
   timeEntries=timeEntries.filter(e=>e.id!==id);
-  save();refreshCurrentView();showToast('Entry deleted');
+  await save();refreshCurrentView();showToast('Entry deleted');
 }
-function refreshCurrentView(){
+async function syncNow(){
+  setSyncStatus('Syncing…',false);
+  await pushJobsToCloud();
+  showToast('Jobs pushed to employee app ✓');
+}
+
+
   if(currentView==='dashboard') renderDashboard();
   else if(currentView==='jobs') renderJobsView();
   else if(currentView==='hours') renderHoursView();
@@ -1189,9 +1247,11 @@ function renderQuotedView(){
 // ═══════════════════════════════════════════
 // BOOT
 // ═══════════════════════════════════════════
-load();
-loadQuoted();
-renderDashboard();
+(async()=>{
+  await load();
+  loadQuoted();
+  renderDashboard();
+})();
 </script>
 </body>
 </html>
